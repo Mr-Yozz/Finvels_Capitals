@@ -26,28 +26,77 @@ class RepaymentController extends Controller
     //     return view('repayments.index', compact('repayments'));
     // }
 
+    // public function index(Request $request)
+    // {
+    //     // If a specific member is selected, show their repayments
+    //     if ($request->has('member_id')) {
+    //         $member = Member::findOrFail($request->member_id);
+
+    //         $repayments = Repayment::with('loan')
+    //             ->whereHas('loan', function ($q) use ($member) {
+    //                 $q->where('member_id', $member->id);
+    //             })
+    //             ->latest()
+    //             ->paginate(10);
+
+    //         return view('repayments.index', compact('repayments', 'member'));
+    //     }
+
+    //     // Otherwise, show the member list
+    //     // $members = Member::orderBy('name')->get();
+    //     $members = Member::orderBy('name', 'asc')->paginate(12);
+
+    //     return view('repayments.members', compact('members'));
+    // }
+
     public function index(Request $request)
     {
-        // If a specific member is selected, show their repayments
-        if ($request->has('member_id')) {
-            $member = Member::findOrFail($request->member_id);
+        // CASE 1: If a specific member is selected — show that member’s repayment table
+        if ($request->has('loan_id')) {
+            $loan = \App\Models\Loan::with(['member', 'repayments'])->findOrFail($request->loan_id);
+            $repayments = $loan->repayments()->latest()->paginate(10);
 
-            $repayments = Repayment::with('loan')
-                ->whereHas('loan', function ($q) use ($member) {
-                    $q->where('member_id', $member->id);
-                })
-                ->latest()
-                ->paginate(10);
-
-            return view('repayments.index', compact('repayments', 'member'));
+            return view('repayments.index', compact('loan', 'repayments'));
         }
 
-        // Otherwise, show the member list
-        // $members = Member::orderBy('name')->get();
-        $members = Member::orderBy('name', 'asc')->paginate(12);
+        // 2️⃣ Loan List (specific member)
+        if ($request->has('member_id')) {
+            $member = \App\Models\Member::with(['loans.branch'])->findOrFail($request->member_id);
+            $loans = $member->loans()->withCount(['repayments'])->get();
 
-        return view('repayments.members', compact('members'));
+            return view('repayments.member_loans', compact('member', 'loans'));
+        }
+
+        // CASE 2: If a specific group is selected — show all members under that group
+        if ($request->has('group_id')) {
+            $group = \App\Models\Group::with(['members.loans.repayments'])->findOrFail($request->group_id);
+
+            $members = $group->members->map(function ($member) {
+                $totalLoans = $member->loans->count();
+                $totalDue = $member->loans->sum(fn($loan) => $loan->repayments->where('status', 'due')->sum('amount'));
+                $totalPaid = $member->loans->sum(fn($loan) => $loan->repayments->where('status', 'paid')->sum('amount'));
+                $totalDueCount = $member->loans->sum(fn($loan) => $loan->repayments->where('status', 'due')->count());
+                $nextDueDate = $member->loans->flatMap->repayments->where('status', 'due')->sortBy('due_date')->first()->due_date ?? null;
+
+                return [
+                    'member' => $member,
+                    'totalLoans' => $totalLoans,
+                    'totalDue' => $totalDue,
+                    'totalPaid' => $totalPaid,
+                    'totalDueCount' => $totalDueCount,
+                    'nextDueDate' => $nextDueDate,
+                ];
+            });
+
+            return view('repayments.group_members', compact('group', 'members'));
+        }
+
+        // CASE 3: Default — show all groups first
+        $groups = \App\Models\Group::orderBy('name', 'asc')->paginate(12);
+
+        return view('repayments.groups', compact('groups'));
     }
+
 
     /**
      * Show the form for creating a new resource.

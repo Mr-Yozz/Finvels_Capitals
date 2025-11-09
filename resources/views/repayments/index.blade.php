@@ -114,10 +114,10 @@
 
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
         <h2 class="text-primary fw-bold mb-2 mb-md-0">
-            Repayments — {{ $member->name }}
+            Repayments — {{ $loan->member->name }}
         </h2>
-        <a href="{{ route('repayments.index') }}" class="btn btn-outline-secondary shadow-sm">
-            <i class="bi bi-arrow-left me-1"></i> Back to Members
+        <a href="{{ route('repayments.index', ['member_id' => $loan->member_id]) }}" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Back to Loans
         </a>
     </div>
 
@@ -203,7 +203,13 @@
     </div>
 
     <div class="d-flex justify-content-center mt-3">
+        @if(isset($member))
         {{ $repayments->appends(['member_id' => $member->id])->links('pagination::bootstrap-5') }}
+        @elseif(isset($loan))
+        {{ $repayments->appends(['loan_id' => $loan->id])->links('pagination::bootstrap-5') }}
+        @else
+        {{ $repayments->links('pagination::bootstrap-5') }}
+        @endif
     </div>
 </div>
 @endsection

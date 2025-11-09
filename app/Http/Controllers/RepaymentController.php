@@ -6,6 +6,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Repayment;
 use App\Models\Loan;
 use App\Models\Branch;
+use App\Models\Member;
 use App\Exports\RepaymentsExport;
 use App\Exports\BranchReportExport;
 use App\Exports\DailyRepaymentsExport;
@@ -19,10 +20,33 @@ class RepaymentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    // public function index()
+    // {
+    //     $repayments = Repayment::with('loan.member')->latest()->paginate(10);
+    //     return view('repayments.index', compact('repayments'));
+    // }
+
+    public function index(Request $request)
     {
-        $repayments = Repayment::with('loan.member')->latest()->paginate(10);
-        return view('repayments.index', compact('repayments'));
+        // If a specific member is selected, show their repayments
+        if ($request->has('member_id')) {
+            $member = Member::findOrFail($request->member_id);
+
+            $repayments = Repayment::with('loan')
+                ->whereHas('loan', function ($q) use ($member) {
+                    $q->where('member_id', $member->id);
+                })
+                ->latest()
+                ->paginate(10);
+
+            return view('repayments.index', compact('repayments', 'member'));
+        }
+
+        // Otherwise, show the member list
+        // $members = Member::orderBy('name')->get();
+        $members = Member::orderBy('name', 'asc')->paginate(12);
+
+        return view('repayments.members', compact('members'));
     }
 
     /**

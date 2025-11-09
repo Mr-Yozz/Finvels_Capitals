@@ -106,9 +106,18 @@
 @section('content')
 <div class="container my-4">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-        <h2 class="text-primary fw-bold mb-2 mb-md-0">Repayments</h2>
+        <h2 class="text-primary fw-bold mb-2 mb-md-0"></h2>
         <a href="{{ route('repayments.create') }}" class="btn btn-success shadow-sm">
             <i class="bi bi-plus-circle me-1"></i> Add Repayment
+        </a>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <h2 class="text-primary fw-bold mb-2 mb-md-0">
+            Repayments — {{ $member->name }}
+        </h2>
+        <a href="{{ route('repayments.index') }}" class="btn btn-outline-secondary shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Members
         </a>
     </div>
 
@@ -143,9 +152,9 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($repayments as $repayment)
+                @forelse($repayments as $index => $repayment)
                 <tr>
-                    <td>{{ $repayment->id }}</td>
+                    <td>{{ $index + 1 }}</td>
                     <td>#{{ $repayment->loan->id ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($repayment->due_date)->format('d M Y') }}</td>
                     <td>₹{{ number_format($repayment->amount, 2) }}</td>
@@ -194,7 +203,7 @@
     </div>
 
     <div class="d-flex justify-content-center mt-3">
-        {{ $repayments->links('pagination::bootstrap-5') }}
+        {{ $repayments->appends(['member_id' => $member->id])->links('pagination::bootstrap-5') }}
     </div>
 </div>
 @endsection

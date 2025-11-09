@@ -1,5 +1,47 @@
 @extends('layouts.app')
+@section('styles')
+<style>
+    .icon-wrapper {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
 
+    .hover-shadow:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #4e73df, #1cc88a);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #1cc88a, #36b9cc);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #f6c23e, #ffdd59);
+    }
+
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, #858796, #d1d3e2);
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #36b9cc, #4e73df);
+    }
+
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #e74a3b, #f0932b);
+    }
+
+    
+</style>
+@endsection
 @section('content')
 <div class="container-fluid py-4">
     <h4 class="mb-4 fw-bold">📊 Loan Dashboard</h4>
@@ -74,47 +116,7 @@
 
 @endsection
 
-@section('styles')
-<style>
-    .icon-wrapper {
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-    }
 
-    .hover-shadow:hover {
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #4e73df, #1cc88a);
-    }
-
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #1cc88a, #36b9cc);
-    }
-
-    .bg-gradient-warning {
-        background: linear-gradient(135deg, #f6c23e, #ffdd59);
-    }
-
-    .bg-gradient-secondary {
-        background: linear-gradient(135deg, #858796, #d1d3e2);
-    }
-
-    .bg-gradient-info {
-        background: linear-gradient(135deg, #36b9cc, #4e73df);
-    }
-
-    .bg-gradient-danger {
-        background: linear-gradient(135deg, #e74a3b, #f0932b);
-    }
-</style>
-@endsection
 
 @section('scripts')
 @vite(['resources/js/dashboard-charts.js'])

@@ -18,9 +18,77 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('css/app.css')}}">
     <link rel="stylesheet" href="{{asset('css/side.css')}}">
-    
+
     <!-- Scripts -->
     <!-- @vite(['resources/css/app.css', 'resources/js/app.js']) -->
+    <style>
+        /* Sidebar Dropdown Hover Behavior */
+        /* Sidebar Dropdown Hover */
+        /* .sidebar {
+            position: relative;
+            z-index: 100;
+           
+        }
+
+        .sidebar .dropdown {
+            position: relative;
+        }
+
+        .sidebar .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            display: none;
+            z-index: 1050;
+           
+            background-color: #212529;
+            border: none;
+            min-width: 180px;
+            padding: 0;
+        }
+
+        .sidebar .dropdown:hover>.dropdown-menu {
+            display: block;
+        }
+
+        .sidebar .dropdown-menu .dropdown-item {
+            color: #fff;
+            padding: 8px 15px;
+        }
+
+        .sidebar .dropdown-menu .dropdown-item:hover {
+            background-color: #343a40;
+        }*/
+
+        .sidebar {
+            /* position: relative; */
+            z-index: 100;
+            
+        }
+
+        .sidebar .dropdown:hover>.dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+
+        .sidebar .dropdown-menu {
+            background-color: #2412c6ff;
+            border: none;
+            padding: 0;
+            left: 9.0rem;
+            bottom: -32px;
+            min-width: 180px;
+        }
+
+        .sidebar .dropdown-menu .dropdown-item {
+            color: #fff;
+            padding: 8px 15px;
+        }
+
+        .sidebar .dropdown-menu .dropdown-item:hover {
+            background-color: #5055e6ff;
+        }
+    </style>
     @yield('styles')
 </head>
 

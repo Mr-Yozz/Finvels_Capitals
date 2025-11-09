@@ -54,12 +54,47 @@ class RepaymentController extends Controller
         // CASE 1: If a specific member is selected — show that member’s repayment table
         if ($request->has('loan_id')) {
             $loan = \App\Models\Loan::with(['member', 'repayments'])->findOrFail($request->loan_id);
-            $repayments = $loan->repayments()->latest()->paginate(10);
+            // $repayments = $loan->repayments()->latest()->paginate(10);
 
-            return view('repayments.index', compact('loan', 'repayments'));
+            // Paginated repayments
+            $repayments = $loan->repayments()->orderBy('due_date', 'asc')->paginate(10);
+
+            // We need loan details to calculate EMI breakdown
+            $monthlyRate = $loan->interest_rate / 100 / 12;
+            $remaining = $loan->principal;
+
+            // To compute correct split, we need *all* repayments temporarily
+            $allRepayments = $loan->repayments()->orderBy('due_date', 'asc')->get();
+
+            // Pre-calculate the full amortization schedule once
+            $schedule = collect();
+            foreach ($allRepayments as $r) {
+                $interest = $remaining * $monthlyRate;
+                $principal = $loan->monthly_emi - $interest;
+                $remaining -= $principal;
+
+                $schedule[$r->id] = [
+                    'principal_part' => round($principal, 2),
+                    'interest_part' => round($interest, 2),
+                    'remaining_balance' => round(max($remaining, 0), 2),
+                ];
+            }
+
+            // Attach only for paginated ones
+            foreach ($repayments as $r) {
+                if (isset($schedule[$r->id])) {
+                    $r->principal_part = $schedule[$r->id]['principal_part'];
+                    $r->interest_part = $schedule[$r->id]['interest_part'];
+                    $r->remaining_balance = $schedule[$r->id]['remaining_balance'];
+                }
+            }
+
+            $member = $loan->member;
+
+            return view('repayments.index', compact('loan', 'repayments', 'member'));
         }
 
-        // 2️⃣ Loan List (specific member)
+        // CASE 2: Loan List (specific member)
         if ($request->has('member_id')) {
             $member = \App\Models\Member::with(['loans.branch'])->findOrFail($request->member_id);
             $loans = $member->loans()->withCount(['repayments'])->get();
@@ -67,7 +102,7 @@ class RepaymentController extends Controller
             return view('repayments.member_loans', compact('member', 'loans'));
         }
 
-        // CASE 2: If a specific group is selected — show all members under that group
+        // CASE 3: If a specific group is selected — show all members under that group
         if ($request->has('group_id')) {
             $group = \App\Models\Group::with(['members.loans.repayments'])->findOrFail($request->group_id);
 
@@ -91,7 +126,7 @@ class RepaymentController extends Controller
             return view('repayments.group_members', compact('group', 'members'));
         }
 
-        // CASE 3: Default — show all groups first
+        // CASE 4: Default — show all groups first
         $groups = \App\Models\Group::orderBy('name', 'asc')->paginate(12);
 
         return view('repayments.groups', compact('groups'));

@@ -144,7 +144,10 @@
                     <th>ID</th>
                     <th>Loan</th>
                     <th>Due Date</th>
-                    <th>Amount</th>
+                    <th>EMI Amount</th>
+                    <th>Principal</th>
+                    <th>Interest</th>
+                    <th>Remaining</th>
                     <th>Paid</th>
                     <th>Status</th>
                     <th>Paid At</th>
@@ -156,9 +159,16 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>#{{ $repayment->loan->id ?? '-' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($repayment->due_date)->format('d M Y') }}</td>
+                    <td>{{ $repayment->due_date->format('d M Y') }}</td>
                     <td>₹{{ number_format($repayment->amount, 2) }}</td>
+
+                    {{-- new breakdown columns --}}
+                    <td>₹{{ number_format($repayment->principal_part ?? 0, 2) }}</td>
+                    <td>₹{{ number_format($repayment->interest_part ?? 0, 2) }}</td>
+                    <td>₹{{ number_format($repayment->remaining_balance ?? 0, 2) }}</td>
+
                     <td>₹{{ number_format($repayment->paid_amount, 2) }}</td>
+
                     <td>
                         @switch($repayment->status)
                         @case('paid')
@@ -174,7 +184,9 @@
                         <span class="badge bg-secondary px-3 py-2">{{ ucfirst($repayment->status) }}</span>
                         @endswitch
                     </td>
+
                     <td>{{ $repayment->paid_at ? \Carbon\Carbon::parse($repayment->paid_at)->format('d M Y, h:i A') : '-' }}</td>
+
                     <td class="text-center text-nowrap">
                         <a href="{{ route('repayments.show', $repayment->id) }}" class="btn btn-sm btn-outline-primary me-1">
                             <i class="bi bi-eye"></i>
@@ -193,7 +205,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-4">
+                    <td colspan="11" class="text-center text-muted py-4">
                         <i class="bi bi-inbox"></i> No repayments found.
                     </td>
                 </tr>
@@ -203,13 +215,12 @@
     </div>
 
     <div class="d-flex justify-content-center mt-3">
-        @if(isset($member))
-        {{ $repayments->appends(['member_id' => $member->id])->links('pagination::bootstrap-5') }}
-        @elseif(isset($loan))
+        @if(isset($loan))
         {{ $repayments->appends(['loan_id' => $loan->id])->links('pagination::bootstrap-5') }}
         @else
-        {{ $repayments->links('pagination::bootstrap-5') }}
+        {{ $repayments->appends(request()->query())->links('pagination::bootstrap-5') }}
         @endif
     </div>
+
 </div>
 @endsection

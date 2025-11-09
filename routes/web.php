@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BranchController;
@@ -24,6 +25,8 @@ use App\Http\Controllers\RepaymentController;
 // });
 
 Route::get('/', [AuthController::class, 'showLogin']);
+
+Route::get('register/', [AuthController::class, 'register']);
 Route::post('login/', [AuthController::class, 'login'])->name('login');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 

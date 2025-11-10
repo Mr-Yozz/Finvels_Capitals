@@ -12,13 +12,15 @@ class AuthController extends Controller
     public function showLogin()
     {
         // return view('auth.login'); 
-        if (Auth::check()) {
-            // If logged in → show login page (or redirect to dashboard)
-            return view('auth.login');
-        } else {
-            // If not logged in → show register page
-            return view('auth.register');
-        }
+        // if (Auth::check()) {
+        //     // If logged in → show login page (or redirect to dashboard)
+        //     return view('auth.login');
+        // }
+        // else {
+        //     // If not logged in → show register page
+        //     return view('auth.register');
+        // }
+        return view('auth.login');
     }
 
     public function login(Request $request)

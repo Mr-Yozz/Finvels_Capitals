@@ -63,7 +63,7 @@
         .sidebar {
             /* position: relative; */
             z-index: 100;
-            
+
         }
 
         .sidebar .dropdown:hover>.dropdown-menu {
@@ -116,7 +116,19 @@
                     <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
                     @endif
                     @else
-                    <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                    </li>
+
+                    @if(Auth::user()->role === 'admin')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('users.create') }}">Create Manager</a>
+                    </li>
+                    @elseif(Auth::user()->role === 'manager')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('users.create') }}">Create User</a>
+                    </li>
+                    @endif
 
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
@@ -134,6 +146,7 @@
                     </li>
                     @endguest
                 </ul>
+
             </div>
         </div>
     </nav>

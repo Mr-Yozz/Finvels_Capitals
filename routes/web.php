@@ -10,6 +10,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RepaymentController;
+use App\Http\Controllers\UserManagementController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -24,14 +25,25 @@ use App\Http\Controllers\RepaymentController;
 //         ->name('admin.dashboard');
 // });
 
-Route::get('/', [AuthController::class, 'showLogin']);
+Route::get('/', [AuthController::class, 'showLogin'])->name('home');
+// Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('register/', [AuthController::class, 'register']);
-Route::post('login/', [AuthController::class, 'login'])->name('login');
-Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+// Admin + Manager dashboard access
+Route::middleware(['auth', 'role:admin,manager'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('users', UserManagementController::class);
+});
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// Manager-only routes (if you have manager-specific dashboard)
+Route::middleware(['auth', 'role:manager'])->group(function () {
+    Route::get('/manager/dashboard', [DashboardController::class, 'manager'])->name('manager.dashboard');
+});
+
+// User-only routes
+Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::get('/profile', [DashboardController::class, 'user'])->name('user.profile');
 });
 
 Route::prefix('branch')->controller(BranchController::class)->group(function () {

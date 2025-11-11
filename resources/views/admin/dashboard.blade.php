@@ -14,30 +14,6 @@
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
         transition: all 0.3s ease-in-out;
     }
-
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #4e73df, #1cc88a);
-    }
-
-    .bg-gradient-success {
-        background: linear-gradient(135deg, #1cc88a, #36b9cc);
-    }
-
-    .bg-gradient-warning {
-        background: linear-gradient(135deg, #f6c23e, #ffdd59);
-    }
-
-    .bg-gradient-secondary {
-        background: linear-gradient(135deg, #858796, #d1d3e2);
-    }
-
-    .bg-gradient-info {
-        background: linear-gradient(135deg, #36b9cc, #4e73df);
-    }
-
-    .bg-gradient-danger {
-        background: linear-gradient(135deg, #e74a3b, #f0932b);
-    }
 </style>
 @endsection
 @section('content')
@@ -52,22 +28,28 @@
     <!-- Summary Cards -->
     <div class="row">
         @foreach([
-        ['Total Loans', $summary['total_loans'], 'bi bi-collection', 'bg-gradient-primary', $summaryTrends['total_loans'] ?? []],
-        ['Active Loans', $summary['active_loans'], 'bi bi-check-circle', 'bg-gradient-success', $summaryTrends['active_loans'] ?? []],
-        ['Pending Loans', $summary['pending_loans'], 'bi bi-hourglass-split', 'bg-gradient-warning', $summaryTrends['pending_loans'] ?? []],
-        ['Closed Loans', $summary['closed_loans'], 'bi bi-lock', 'bg-gradient-secondary', $summaryTrends['closed_loans'] ?? []],
-        ['Total Disbursed', '₹'.number_format($summary['total_disbursed']), 'bi bi-cash-stack', 'bg-gradient-info', $summaryTrends['total_disbursed'] ?? []],
-        ['Total Outstanding', '₹'.number_format($summary['total_outstanding']), 'bi bi-graph-down', 'bg-gradient-danger', $summaryTrends['total_outstanding'] ?? []],
-        ['Upcoming Repayments', $summary['upcoming_repayments'], 'bi bi-bell', 'bg-gradient-success', $summaryTrends['upcoming_repayments'] ?? []],
-        ['Overdue Repayments', $summary['overdue_repayments'], 'bi bi-exclamation-triangle', 'bg-gradient-danger', $summaryTrends['overdue_repayments'] ?? []],
+        ['Total Loans', $summary['total_loans'], 'bi bi-collection', 'images/loan.jpg', 'bg-gradient-primary', $summaryTrends['total_loans'] ?? []],
+        ['Active Loans', $summary['active_loans'], 'bi bi-check-circle', 'images/activeIcon.png', 'bg-gradient-success', $summaryTrends['active_loans'] ?? []],
+        ['Pending Loans', $summary['pending_loans'], 'bi bi-hourglass-split', 'images/pending.png', 'bg-gradient-warning', $summaryTrends['pending_loans'] ?? []],
+        ['Closed Loans', $summary['closed_loans'], 'bi bi-lock', 'images/close.png', 'bg-gradient-secondary', $summaryTrends['closed_loans'] ?? []],
+        ['Total Disbursed', '₹'.number_format($summary['total_disbursed']), 'bi bi-cash-stack', 'images/distribution.png', 'bg-gradient-info', $summaryTrends['total_disbursed'] ?? []],
+        ['Total Outstanding', '₹'.number_format($summary['total_outstanding']), 'bi bi-graph-down', 'images/outstanding.png', 'bg-gradient-danger', $summaryTrends['total_outstanding'] ?? []],
+        ['Upcoming Repayments', $summary['upcoming_repayments'], 'bi bi-bell', 'images/upcoming.png', 'bg-gradient-success', $summaryTrends['upcoming_repayments'] ?? []],
+        ['Overdue Repayments', $summary['overdue_repayments'], 'bi bi-exclamation-triangle', 'images/over.png', 'bg-gradient-danger', $summaryTrends['overdue_repayments'] ?? []],
         ] as $card)
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card shadow-sm border-0 h-100 hover-shadow">
                 <div class="card-body d-flex align-items-center">
-                    <div class="icon-wrapper me-3 {{ $card[3] }}">
-                        <i class="{{ $card[2] }} fs-2 text-white"></i>
+                    <!-- Gradient Box -->
+                    <div class="d-flex align-items-center justify-content-center rounded {{ $card[4] }}"
+                        style="width: 50px; height: 50px;">
+
+                        <img src="{{ asset($card[3]) }}" alt="{{ $card[0] }}" style="width:50px; height:50px;"
+                            onerror="this.style.display='none'; this.parentNode.querySelector('i').style.display='block';">
+                        <i class="{{ $card[2] }} fs-2 text-white" style="display:none;"></i>
                     </div>
-                    <div class="w-100">
+
+                    <div class="w-100 ms-3">
                         <h6 class="text-muted mb-1">{{ $card[0] }}</h6>
                         <h5 class="fw-bold">
                             <span class="counter" data-count="{{ is_numeric($card[1]) ? $card[1] : preg_replace('/[^0-9]/','',$card[1]) }}">
@@ -75,7 +57,7 @@
                             </span>
                         </h5>
                         <canvas class="sparkline mt-2 w-100"
-                            data-values='@json($card[4])' height="30"></canvas>
+                            data-values='@json($card[5])' height="30"></canvas>
                     </div>
                 </div>
             </div>

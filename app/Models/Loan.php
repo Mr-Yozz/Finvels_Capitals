@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+
 class Loan extends Model
 {
     //
@@ -66,5 +67,16 @@ class Loan extends Model
         $total_due = $this->repayments()->sum('amount');
         $paid = $this->repayments()->sum('paid_amount');
         return $total_due - $paid;
+    }
+
+    public function scopeAccessibleBy($query, $user)
+    {
+        if ($user->role === 'admin') {
+            return $query;
+        } elseif ($user->role === 'manager') {
+            return $query->where('branch_id', $user->branch_id);
+        }
+
+        return $query->whereHas('member.user', fn($q) => $q->where('id', $user->id));
     }
 }

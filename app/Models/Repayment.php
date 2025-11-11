@@ -28,4 +28,13 @@ class Repayment extends Model
         $this->save();
         \App\Models\AuditLog::log(Auth::id() ?? 0, 'repayment.paid', ['repayment_id' => $this->id, 'amount' => $amount]);
     }
+
+    public function scopeAccessibleBy($query, $user)
+    {
+        if ($user->role === 'admin') return $query;
+        if ($user->role === 'manager') {
+            return $query->whereHas('loan', fn($q) => $q->where('branch_id', $user->branch_id));
+        }
+        return $query->whereHas('loan.member.user', fn($q) => $q->where('id', $user->id));
+    }
 }

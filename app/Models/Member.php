@@ -28,4 +28,13 @@ class Member extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function scopeAccessibleBy($query, $user)
+    {
+        if ($user->role === 'admin') return $query;
+        if ($user->role === 'manager') {
+            return $query->whereHas('group', fn($q) => $q->where('branch_id', $user->branch_id));
+        }
+        return $query->where('user_id', $user->id);
+    }
 }

@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
-            $table->string('role')->default('manager'); // possible: admin, branch_manager
-            $table->foreignId('branch_id')->nullable()->constrained('branches')->cascadeOnDelete();
+            $table->foreignId('branch_id')
+                ->nullable()
+                ->constrained()
+                ->onDelete('cascade');
         });
     }
 
@@ -24,7 +25,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropForeign(['branch_id']); // drop FK first
+            $table->dropColumn('branch_id');
         });
     }
 };

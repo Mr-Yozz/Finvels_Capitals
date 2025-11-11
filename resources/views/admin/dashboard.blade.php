@@ -38,13 +38,16 @@
     .bg-gradient-danger {
         background: linear-gradient(135deg, #e74a3b, #f0932b);
     }
-
-    
 </style>
 @endsection
 @section('content')
 <div class="container-fluid py-4">
-    <h4 class="mb-4 fw-bold">📊 Loan Dashboard</h4>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">📊 Loan Dashboard</h4>
+        <a href="{{ route('accounts.dashboard') }}" class="btn btn-primary btn-lg">
+            Account Dashboard
+        </a>
+    </div>
 
     <!-- Summary Cards -->
     <div class="row">

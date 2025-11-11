@@ -11,6 +11,9 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RepaymentController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\AccountCategoryController;
+use App\Http\Controllers\AccountDashboardController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -108,6 +111,19 @@ Route::get('reports/daily/export/pdf', [RepaymentController::class, 'exportPdfDa
 Route::get('reports/branch/export/excel', [RepaymentController::class, 'exportExcelBranchReport'])->name('reports.branch.export.excel');
 Route::get('reports/branch/export/pdf', [RepaymentController::class, 'exportPdfBranchReport'])->name('reports.branch.export.pdf');
 
+Route::middleware(['auth', 'role:admin,manager'])->group(function () {
+    Route::resource('expenses', ExpenseController::class);
+});
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('accounts/categories', [AccountCategoryController::class, 'index'])->name('account.categories');
+    Route::post('accounts/categories', [AccountCategoryController::class, 'store'])->name('account.categories.store');
+    Route::delete('accounts/categories/{id}', [AccountCategoryController::class, 'destroy'])->name('account.categories.delete');
+});
+
+Route::middleware(['auth', 'role:admin,manager'])->group(function () {
+    Route::get('/accounts/dashboard', [AccountDashboardController::class, 'index'])->name('accounts.dashboard');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -20,7 +20,8 @@ class AuthController extends Controller
         //     // If not logged in → show register page
         //     return view('auth.register');
         // }
-        return view('auth.login');
+        // return view('auth.login');
+        return view('admin.login');
     }
 
     public function login(Request $request)

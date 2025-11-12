@@ -14,6 +14,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountDashboardController;
+use App\Http\Controllers\BaseController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -27,8 +28,12 @@ use App\Http\Controllers\AccountDashboardController;
 //     Route::get('/dashboard', [DashboardController::class, 'index'])
 //         ->name('admin.dashboard');
 // });
+Route::get('/', [BaseController::class, 'base'])->name('base');
+Route::get('/about', [BaseController::class, 'about'])->name('about');
+Route::get('/service', [BaseController::class, 'service'])->name('service');
+Route::get('/contact', [BaseController::class, 'contact'])->name('contact');
 
-Route::get('/', [AuthController::class, 'showLogin'])->name('home');
+Route::get('/showLogin', [AuthController::class, 'showLogin'])->name('home');
 // Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

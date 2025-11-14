@@ -16,18 +16,7 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\BaseController;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
-// Route::get('/', function () {
-//     return view('admin.dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-// Route::middleware(['auth', 'role:admin'])->group(function () {
-//     Route::get('/dashboard', [DashboardController::class, 'index'])
-//         ->name('admin.dashboard');
-// });
 Route::get('/', [BaseController::class, 'base'])->name('base');
 Route::get('/about', [BaseController::class, 'about'])->name('about');
 Route::get('/service', [BaseController::class, 'service'])->name('service');
@@ -45,14 +34,25 @@ Route::middleware(['auth', 'role:admin,manager'])->group(function () {
 });
 
 // Manager-only routes (if you have manager-specific dashboard)
-Route::middleware(['auth', 'role:manager'])->group(function () {
-    Route::get('/manager/dashboard', [DashboardController::class, 'manager'])->name('manager.dashboard');
+// Route::middleware(['auth', 'role:manager'])->group(function () {
+//     Route::get('/manager/dashboard', [DashboardController::class, 'manager'])->name('manager.dashboard');
+// });
+
+Route::middleware(['auth'])->group(function () {
+
+    // Profile Show & Edit
+    Route::get('/admin/user/profile', [ProfileController::class, 'edit'])->name('admin.user.edit');
+
+    // Update Profile
+    Route::post('/admin/user/profile/update', [ProfileController::class, 'update'])->name('admin.user.update');
+
+    // Update Password
+    Route::post('/admin/user/profile/update-password', [ProfileController::class, 'updatePassword'])->name('admin.user.updatePassword');
+
+    // Delete Account
+    Route::delete('/admin/user/delete', [ProfileController::class, 'destroy'])->name('admin.user.delete');
 });
 
-// User-only routes
-Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('/profile', [DashboardController::class, 'user'])->name('user.profile');
-});
 
 Route::prefix('branch')->controller(BranchController::class)->group(function () {
 

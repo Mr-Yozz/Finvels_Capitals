@@ -84,4 +84,9 @@ class DashboardController extends Controller
         ));
         // return view('admin.dashboard', compact('totalLoans', 'totalRepayments'));
     }
+
+    public function user(){
+
+        return view('admin.user');
+    }
 }

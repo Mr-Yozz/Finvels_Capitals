@@ -17,6 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500&family=Jost:wght@500;600;700&display=swap" rel="stylesheet">
 
     <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -125,122 +126,58 @@
         <!-- Service End -->
 
 
-        <!-- Newsletter Start -->
-        <!-- <div class="container-xxl bg-primary newsletter py-5 wow fadeInUp" data-wow-delay="0.1s">
-            <div class="container py-5 px-lg-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-7 text-center">
-                        <p class="section-title text-white justify-content-center"><span></span>Newsletter<span></span></p>
-                        <h1 class="text-center text-white mb-4">Stay Always In Touch</h1>
-                        <p class="text-white mb-4">Diam dolor diam ipsum et tempor sit. Aliqu diam amet diam et eos labore. Clita erat ipsum et lorem et sit sed stet lorem sit clita duo justo</p>
-                        <div class="position-relative w-100 mt-3">
-                            <input class="form-control border-0 rounded-pill w-100 ps-4 pe-5" type="text" placeholder="Enter Your Email" style="height: 48px;">
-                            <button type="button" class="btn shadow-none position-absolute top-0 end-0 mt-1 me-2"><i class="fa fa-paper-plane text-primary fs-4"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!-- Newsletter End -->
+        <!-- Loan Management - Parallax Service Section -->
+        <div class="parallax-services">
+            <div class="services-overlay">
+                <h2 class="services-title">Complete Loan Management Services</h2>
+                <p class="services-subtitle">
+                    We provide end-to-end digital loan management solutions designed to make borrowing
+                    faster, easier, and more transparent for individuals and businesses.
+                </p>
 
+                <p class="services-description">
+                    From online loan applications to automated eligibility checks, real-time status tracking,
+                    and instant document verification, our platform ensures a smooth and hassle-free borrowing experience.
+                    With secure data processing, flexible loan options, and dedicated customer support, we help you
+                    manage your finances confidently and conveniently—all from one smart dashboard.
+                </p>
 
-        <!-- Testimonial Start -->
-        <!-- <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
-            <div class="container py-5 px-lg-5">
-                <p class="section-title text-secondary justify-content-center"><span></span>Testimonial<span></span></p>
-                <h1 class="text-center mb-5">What Say Our Clients!</h1>
-                <div class="owl-carousel testimonial-carousel">
-                    <div class="testimonial-item bg-light rounded my-4">
-                        <p class="fs-5"><i class="fa fa-quote-left fa-4x text-primary mt-n4 me-3"></i>Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit sed stet lorem sit clita duo justo.</p>
-                        <div class="d-flex align-items-center">
-                            <img class="img-fluid flex-shrink-0 rounded-circle" src="img/testimonial-1.jpg" style="width: 65px; height: 65px;">
-                            <div class="ps-4">
-                                <h5 class="mb-1">Client Name</h5>
-                                <span>Profession</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-item bg-light rounded my-4">
-                        <p class="fs-5"><i class="fa fa-quote-left fa-4x text-primary mt-n4 me-3"></i>Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit sed stet lorem sit clita duo justo.</p>
-                        <div class="d-flex align-items-center">
-                            <img class="img-fluid flex-shrink-0 rounded-circle" src="img/testimonial-2.jpg" style="width: 65px; height: 65px;">
-                            <div class="ps-4">
-                                <h5 class="mb-1">Client Name</h5>
-                                <span>Profession</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-item bg-light rounded my-4">
-                        <p class="fs-5"><i class="fa fa-quote-left fa-4x text-primary mt-n4 me-3"></i>Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit sed stet lorem sit clita duo justo.</p>
-                        <div class="d-flex align-items-center">
-                            <img class="img-fluid flex-shrink-0 rounded-circle" src="img/testimonial-3.jpg" style="width: 65px; height: 65px;">
-                            <div class="ps-4">
-                                <h5 class="mb-1">Client Name</h5>
-                                <span>Profession</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <p class="services-description">
+                    Whether you’re looking for personal loans, business loans, or emergency credit support,
+                    our streamlined system gives you the clarity and control you need at every step.
+                </p>
             </div>
-        </div> -->
-        <!-- Testimonial End -->
+        </div>
 
 
         <!-- Footer Start -->
         <div class="container-fluid bg-primary text-light footer wow fadeIn" data-wow-delay="0.1s">
             <div class="container py-5 px-lg-5">
                 <div class="row g-5">
+
+                    <div class="col-md-6 col-lg-3">
+                        <p class="section-title text-white h5 mb-4">FinVels<span></span></p>
+                        <p>Providing accessible microfinance to foster entrepreneurship.Key CTAs: Apply for a Loan Today / Learn About Our Impact.Trust Points: Transparent, Accessible, Supportive.</p>
+                    </div>
+
                     <div class="col-md-6 col-lg-3">
                         <p class="section-title text-white h5 mb-4">Address<span></span></p>
                         <p><i class="fa fa-map-marker-alt me-3"></i>123 Street, New York, USA</p>
                         <p><i class="fa fa-phone-alt me-3"></i>+012 345 67890</p>
                         <p><i class="fa fa-envelope me-3"></i>info@finvels.net</p>
                         <div class="d-flex pt-2">
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fa-brands fa-x-twitter"></i></a>
                             <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
                             <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-3">
                         <p class="section-title text-white h5 mb-4">Quick Link<span></span></p>
-                        <a class="btn btn-link" href="">About Us</a>
-                        <a class="btn btn-link" href="">Contact Us</a>
-                        <a class="btn btn-link" href="">Privacy Policy</a>
-                        <a class="btn btn-link" href="">Terms & Condition</a>
-                        <a class="btn btn-link" href="">Career</a>
+                        <a class="btn btn-link" href="{{route('base')}}">Home</a>
+                        <a class="btn btn-link" href="{{route('about')}}">About Us</a>
+                        <a class="btn btn-link" href="{{route('contact')}}">Contact Us</a>
+                        <a class="btn btn-link" href="{{route('service')}}">Service</a>
                     </div>
-                    <!-- <div class="col-md-6 col-lg-3">
-                        <p class="section-title text-white h5 mb-4">Gallery<span></span></p>
-                        <div class="row g-2">
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-1.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-2.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-3.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-4.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-5.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-6.jpg" alt="Image">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <p class="section-title text-white h5 mb-4">Newsletter<span></span></p>
-                        <p>Lorem ipsum dolor sit amet elit. Phasellus nec pretium mi. Curabitur facilisis ornare velit non vulpu</p>
-                        <div class="position-relative w-100 mt-3">
-                            <input class="form-control border-0 rounded-pill w-100 ps-4 pe-5" type="text" placeholder="Your Email" style="height: 48px;">
-                            <button type="button" class="btn shadow-none position-absolute top-0 end-0 mt-1 me-2"><i class="fa fa-paper-plane text-primary fs-4"></i></button>
-                        </div>
-                    </div> -->
                 </div>
             </div>
             <div class="container px-lg-5">
@@ -250,7 +187,7 @@
                             &copy; <a class="border-bottom" href="#">FinVels</a>, All Right Reserved.
 
                             <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                            Designed By <a class="border-bottom" href="https://htmlcodex.com">FinVels</a>
+                            Designed By <a class="border-bottom" href="{{route('base')}}">FinVels</a>
                         </div>
                         <div class="col-md-6 text-center text-md-end">
                             <div class="footer-menu">

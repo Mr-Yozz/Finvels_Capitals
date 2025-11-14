@@ -17,6 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500&family=Jost:wght@500;600;700&display=swap" rel="stylesheet">
 
     <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -58,15 +59,6 @@
                         <a href="{{route('base')}}" class="nav-item nav-link">Home</a>
                         <a href="{{route('about')}}" class="nav-item nav-link">About</a>
                         <a href="{{route('service')}}" class="nav-item nav-link ">Service</a>
-                        <!-- <a href="project.html" class="nav-item nav-link">Project</a>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                            <div class="dropdown-menu m-0">
-                                <a href="team.html" class="dropdown-item">Our Team</a>
-                                <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                                <a href="404.html" class="dropdown-item">404 Page</a>
-                            </div>
-                        </div> -->
                         <a href="{{route('contact')}}" class="nav-item nav-link active">Contact</a>
                     </div>
                     <a href="{{route('home')}}" class="btn rounded-pill py-2 px-4 ms-3 d-none d-lg-block">Login</a>
@@ -148,57 +140,30 @@
         <div class="container-fluid bg-primary text-light footer wow fadeIn" data-wow-delay="0.1s">
             <div class="container py-5 px-lg-5">
                 <div class="row g-5">
+
+                    <div class="col-md-6 col-lg-3">
+                        <p class="section-title text-white h5 mb-4">FinVels<span></span></p>
+                        <p>Providing accessible microfinance to foster entrepreneurship.Key CTAs: Apply for a Loan Today / Learn About Our Impact.Trust Points: Transparent, Accessible, Supportive.</p>
+                    </div>
+
                     <div class="col-md-6 col-lg-3">
                         <p class="section-title text-white h5 mb-4">Address<span></span></p>
                         <p><i class="fa fa-map-marker-alt me-3"></i>123 Street, New York, USA</p>
                         <p><i class="fa fa-phone-alt me-3"></i>+012 345 67890</p>
                         <p><i class="fa fa-envelope me-3"></i>info@finvels.net</p>
                         <div class="d-flex pt-2">
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fa-brands fa-x-twitter"></i></a>
                             <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
                             <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-3">
                         <p class="section-title text-white h5 mb-4">Quick Link<span></span></p>
-                        <a class="btn btn-link" href="">About Us</a>
-                        <a class="btn btn-link" href="">Contact Us</a>
-                        <a class="btn btn-link" href="">Privacy Policy</a>
-                        <a class="btn btn-link" href="">Terms & Condition</a>
-                        <a class="btn btn-link" href="">Career</a>
+                        <a class="btn btn-link" href="{{route('base')}}">Home</a>
+                        <a class="btn btn-link" href="{{route('about')}}">About Us</a>
+                        <a class="btn btn-link" href="{{route('contact')}}">Contact Us</a>
+                        <a class="btn btn-link" href="{{route('service')}}">Service</a>
                     </div>
-                    <!-- <div class="col-md-6 col-lg-3">
-                        <p class="section-title text-white h5 mb-4">Gallery<span></span></p>
-                        <div class="row g-2">
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-1.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-2.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-3.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-4.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-5.jpg" alt="Image">
-                            </div>
-                            <div class="col-4">
-                                <img class="img-fluid" src="img/portfolio-6.jpg" alt="Image">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <p class="section-title text-white h5 mb-4">Newsletter<span></span></p>
-                        <p>Lorem ipsum dolor sit amet elit. Phasellus nec pretium mi. Curabitur facilisis ornare velit non vulpu</p>
-                        <div class="position-relative w-100 mt-3">
-                            <input class="form-control border-0 rounded-pill w-100 ps-4 pe-5" type="text" placeholder="Your Email" style="height: 48px;">
-                            <button type="button" class="btn shadow-none position-absolute top-0 end-0 mt-1 me-2"><i class="fa fa-paper-plane text-primary fs-4"></i></button>
-                        </div>
-                    </div> -->
                 </div>
             </div>
             <div class="container px-lg-5">
@@ -208,7 +173,7 @@
                             &copy; <a class="border-bottom" href="#">FinVels</a>, All Right Reserved.
 
                             <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                            Designed By <a class="border-bottom" href="https://htmlcodex.com">FinVels</a>
+                            Designed By <a class="border-bottom" href="{{route('base')}}">FinVels</a>
                         </div>
                         <div class="col-md-6 text-center text-md-end">
                             <div class="footer-menu">

@@ -57,7 +57,21 @@ class RepaymentController extends Controller
             // $repayments = $loan->repayments()->latest()->paginate(10);
 
             // Paginated repayments
-            $repayments = $loan->repayments()->orderBy('due_date', 'asc')->paginate(10);
+            // $repayments = $loan->repayments()->orderBy('due_date', 'asc')->paginate(10);
+            if ($request->filter == '7days') {
+                $repayments = $loan->repayments()
+                    ->whereBetween('due_date', [
+                        now()->toDateString(),
+                        now()->addDays(7)->toDateString()
+                    ])
+                    ->orderBy('due_date', 'asc')
+                    ->paginate(10);
+            } else {
+                // Default: All repayments
+                $repayments = $loan->repayments()
+                    ->orderBy('due_date', 'asc')
+                    ->paginate(10);
+            }
 
             // We need loan details to calculate EMI breakdown
             $monthlyRate = $loan->interest_rate / 100 / 12;

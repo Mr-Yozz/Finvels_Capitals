@@ -8,7 +8,31 @@ use Illuminate\Support\Facades\Auth;
 class Repayment extends Model
 {
     //
-    protected $fillable = ['loan_id', 'due_date', 'amount', 'paid_amount', 'paid_at', 'status'];
+    protected $fillable = [
+
+        'loan_id',
+        'loan_instance',
+        'due_date',
+        'amount',
+        'balance',
+
+        'paid_amount',
+        'paid_at',
+        'status',
+
+        'due_instance',
+        'due_total',
+
+        'member_adv',
+        'due_disb',
+        'spouse_kyc',
+
+        'principal_component',
+        'interest_component',
+        'pr',
+        'sanchay_due',
+        'lp_pal'
+    ];
 
     protected $casts = [
         'due_date' => 'date',

@@ -136,6 +136,20 @@
             <i class="bi bi-file-earmark-pdf-fill me-1"></i> Export PDF
         </a>
     </div>
+    <div class="mb-3 d-flex gap-2">
+
+        <a href="{{ route('repayments.index', ['loan_id' => $loan->id]) }}"
+            class="btn btn-sm btn-outline-secondary">
+            All
+        </a>
+
+        <a href="{{ route('repayments.index', ['loan_id' => $loan->id, 'filter' => '7days']) }}"
+            class="btn btn-sm btn-outline-primary">
+            Next 7 Days
+        </a>
+
+    </div>
+
 
     <div class="table-responsive mt-3 shadow-sm rounded-3 bg-white p-3">
         <table class="table table-hover align-middle table-bordered" id="repaymentTable">

@@ -38,30 +38,62 @@ class RepaymentScheduleService
 
     public function generate(Loan $loan)
     {
-        // Delete existing repayments first
+        // delete old rows
         $loan->repayments()->delete();
 
         $principal = $loan->principal;
         $rate = $loan->interest_rate / 100 / 12;
         $tenure = $loan->tenure_months;
 
-        $emi = $principal * $rate * pow(1 + $rate, $tenure) / (pow(1 + $rate, $tenure) - 1);
-        $emi = round($emi, 2);
+        $emi = round($principal * $rate * pow(1 + $rate, $tenure) / (pow(1 + $rate, $tenure) - 1), 2);
 
         $loan->update(['monthly_emi' => $emi]);
 
+        $balance = $principal;
         $startDate = Carbon::parse($loan->disbursed_at ?? now());
 
         for ($i = 1; $i <= $tenure; $i++) {
-            $dueDate = $startDate->copy()->addMonths($i);
+            $interest = round($balance * $rate, 2);
+            $principalComponent = round($emi - $interest, 2);
+
+            $balance = round($balance - $principalComponent, 2);
 
             Repayment::create([
                 'loan_id' => $loan->id,
-                'due_date' => $dueDate,
-                'amount' => $emi,
+
+                // instances
+                'loan_instance' => "INST-$i",
+                'due_instance'  => "INST-$i",
+
+                // amounts
+                'amount'     => $emi,
+                'due_total'  => $emi,
+
+                // breakup
+                'principal_component' => $principalComponent,
+                'interest_component'  => $interest,
+                'pr' => $principalComponent,
+
+                // balance
+                'balance'    => $balance,
+
+                // other loan columns
+                'sanchay_due' => 0,
+                'lp_pal'      => null,
+                'member_adv'  => 0,
+                'due_disb'    => 0,
+                'spouse_kyc'  => null,
+
+                // dates
+                'due_date' => $startDate->copy()->addMonths($i),
+
+                // status
+                'status' => 'pending',
             ]);
         }
     }
+
+
 
     /**
      * Calculate outstanding balance for a loan

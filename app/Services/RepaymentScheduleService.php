@@ -88,7 +88,7 @@ class RepaymentScheduleService
                 'due_date' => $startDate->copy()->addMonths($i),
 
                 // status
-                'status' => 'pending',
+                'status' => 'due',
             ]);
         }
     }

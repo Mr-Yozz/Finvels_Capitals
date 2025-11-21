@@ -24,6 +24,6 @@ class Invoice extends Model
 
     public function lines()
     {
-        return $this->hasMany(InvoiceLine::class);
+        return $this->hasMany(InvoiceLine::class, 'invoice_id');
     }
 }

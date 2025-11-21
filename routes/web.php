@@ -140,8 +140,9 @@ Route::middleware('auth')->group(function () {
 Route::resource('invoices', InvoiceController::class);
 
 // PDF download
-Route::get('invoices/{invoice}/pdf', [InvoiceController::class,'downloadPdf'])->name('invoices.pdf');
-
+// Route::get('invoices/{invoice}/pdf', [InvoiceController::class,'downloadPdf'])->name('invoices.pdf');
+Route::get('/invoice/{id}/pdf', [LoanController::class, 'exportPdf_in'])->name('invoice.pdf');
+Route::get('/invoice/{id}/excel', [LoanController::class, 'exportExcel_in'])->name('invoice.excel');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

@@ -155,6 +155,14 @@
         </tbody>
     </table> --}} -->
 
+    <a href="{{ route('invoice.pdf', $loan->invoice->id) }}" class="btn btn-danger">
+        Download PDF
+    </a>
+
+    <a href="{{ route('invoice.excel', $loan->invoice->id) }}" class="btn btn-success">
+        Download Excel
+    </a>
+
     <!-- Borrower / Loan core details -->
     <div class="detail-grid">
         <div>

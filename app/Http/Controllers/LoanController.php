@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invoice;
+use App\Exports\InvoiceExport;
 use App\Services\RepaymentScheduleService;
 use App\Models\Loan;
 use App\Models\AuditLog;
@@ -149,5 +151,20 @@ class LoanController extends Controller
     {
         $loans = Loan::with(['member', 'branch'])->get();
         return Excel::download(new LoansExport($loans), 'loans_report.xlsx');
+    }
+
+
+    public function exportPdf_in($id)
+    {
+        $invoice = Invoice::with(['loan.member', 'lines'])->findOrFail($id);
+
+        $pdf = Pdf::loadView('exports.invoice_pdf', compact('invoice'));
+        return $pdf->download('invoice_' . $invoice->invoice_no . '.pdf');
+    }
+
+    public function exportExcel_in($id)
+    {
+        $invoice = Invoice::with(['loan.member', 'lines'])->findOrFail($id);
+        return Excel::download(new InvoiceExport($invoice), 'invoice_' . $invoice->invoice_no . '.xlsx');
     }
 }

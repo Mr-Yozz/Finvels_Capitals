@@ -46,19 +46,29 @@
         <!-- PRODUCT NAME -->
         <div class="mb-3">
             <label class="form-label text-primary">Product Name</label>
-            <input type="text" name="product_name" class="form-control" placeholder="Example: Pragati Plus Loan" required>
+            <input type="text" name="product_name" class="form-control" placeholder="Example: Pragati Plus Loan" >
         </div>
 
         <!-- LOAN PURPOSE -->
         <div class="mb-3">
             <label class="form-label text-primary">Loan Purpose</label>
-            <input type="text" name="purpose" class="form-control" placeholder="Example: Tailoring Machine" required>
+            <input type="text" name="purpose" class="form-control" placeholder="Example: Tailoring Machine" >
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-primary">Spouse Name</label>
+            <input type="text" name="spousename" class="form-control" placeholder="Spouse Name" >
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-primary">Moratorium</label>
+            <input type="text" name="moratorium" class="form-control" placeholder="Moratorium" >
         </div>
 
         {{-- Principal --}}
         <div class="mb-3">
             <label class="form-label text-primary">Principal</label>
-            <input type="number"  id="principal" name="principal" class="form-control"
+            <input type="number" id="principal" name="principal" class="form-control"
                 value="{{ old('principal', $loan->principal ?? '') }}"
                 step="0.01" required>
             @error('principal') <small class="text-danger">{{ $message }}</small> @enderror

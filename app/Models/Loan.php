@@ -21,6 +21,10 @@ class Loan extends Model
         'repayment_frequency',
         'processing_fee',
         'insurance_amount',
+        'product_name',
+        'purpose',
+        'spousename',
+        'moratorium',
     ];
 
     protected $casts = [

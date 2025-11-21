@@ -46,6 +46,16 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label text-primary">Spouse Name</label>
+            <input type="text" name="spousename" class="form-control" placeholder="Spouse Name" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-primary">Moratorium</label>
+            <input type="text" name="moratorium" class="form-control" placeholder="Moratorium" required>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label text-primary">Principal</label>
             <input type="number" id="principal" name="principal" class="form-control" value="{{ old('principal') }}" required step="0.01">
             @error('principal') <small class="text-danger">{{ $message }}</small> @enderror

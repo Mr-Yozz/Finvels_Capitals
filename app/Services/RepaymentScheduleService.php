@@ -38,25 +38,49 @@ class RepaymentScheduleService
 
     public function generate(Loan $loan)
     {
-        // delete old rows
+        // Delete previous schedule
         $loan->repayments()->delete();
 
         $principal = $loan->principal;
-        $rate = $loan->interest_rate / 100 / 12;
-        $tenure = $loan->tenure_months;
 
-        $emi = round($principal * $rate * pow(1 + $rate, $tenure) / (pow(1 + $rate, $tenure) - 1), 2);
+        // Determine rate & number of installments
+        if ($loan->frequency === 'weekly') {
 
+            $rate = ($loan->interest_rate / 100) / 52;   // weekly
+            $tenure = $loan->tenure_months * 4;          // approx weeks
+            $intervalMethod = 'addWeeks';
+        } else {
+
+            $rate = ($loan->interest_rate / 100) / 12;   // monthly
+            $tenure = $loan->tenure_months;
+            $intervalMethod = 'addMonths';
+        }
+
+        // EMI calculation
+        if ($rate == 0) {
+            $emi = round($principal / $tenure, 2);
+        } else {
+            $emi = round(
+                $principal * ($rate * pow(1 + $rate, $tenure)) /
+                    (pow(1 + $rate, $tenure) - 1),
+                2
+            );
+        }
+
+        // Save EMI once
         $loan->update(['monthly_emi' => $emi]);
 
         $balance = $principal;
         $startDate = Carbon::parse($loan->disbursed_at ?? now());
 
         for ($i = 1; $i <= $tenure; $i++) {
+
             $interest = round($balance * $rate, 2);
             $principalComponent = round($emi - $interest, 2);
-
             $balance = round($balance - $principalComponent, 2);
+
+            // Build due date based on frequency
+            $dueDate = $startDate->copy()->$intervalMethod($i);
 
             Repayment::create([
                 'loan_id' => $loan->id,
@@ -66,8 +90,8 @@ class RepaymentScheduleService
                 'due_instance'  => "INST-$i",
 
                 // amounts
-                'amount'     => $emi,
-                'due_total'  => $emi,
+                'amount'        => $emi,
+                'due_total'     => $emi,
 
                 // breakup
                 'principal_component' => $principalComponent,
@@ -75,7 +99,7 @@ class RepaymentScheduleService
                 'pr' => $principalComponent,
 
                 // balance
-                'balance'    => $balance,
+                'balance'       => $balance,
 
                 // other loan columns
                 'sanchay_due' => 0,
@@ -84,14 +108,15 @@ class RepaymentScheduleService
                 'due_disb'    => 0,
                 'spouse_kyc'  => null,
 
-                // dates
-                'due_date' => $startDate->copy()->addMonths($i),
+                // due date
+                'due_date' => $dueDate,
 
                 // status
                 'status' => 'due',
             ]);
         }
     }
+
 
 
 

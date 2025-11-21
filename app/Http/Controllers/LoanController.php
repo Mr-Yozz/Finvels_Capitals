@@ -47,9 +47,13 @@ class LoanController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'member_id' => 'required|exists:members,id',
             'branch_id' => 'required|exists:branches,id',
+            'product_name' => 'required|max:225',
+            'purpose' => 'required|max:225',
+            'repayment_frequency' => 'required',
+            'insurance_amount' => 'required|numeric',
             'principal' => 'required|numeric|min:1',
             'interest_rate' => 'required|numeric|min:0',
             'tenure_months' => 'required|integer|min:1',
@@ -57,9 +61,13 @@ class LoanController extends Controller
             'status' => 'required|in:pending,active,closed',
         ]);
 
-        $loan = Loan::create($request->all());
+        $data['processing_fee'] = $data['processing_fee'] ?? 0;
+
+        $loan = Loan::create($data);
 
         $this->scheduleService->generate($loan);
+
+
 
         AuditLog::create([
             'user_id' => Auth::id(),
@@ -94,17 +102,23 @@ class LoanController extends Controller
      */
     public function update(Request $request, Loan $loan)
     {
-        $request->validate([
+        $data = $request->validate([
             'member_id' => 'required|exists:members,id',
             'branch_id' => 'required|exists:branches,id',
             'principal' => 'required|numeric|min:1',
+            'product_name' => 'required|max:225',
+            'purpose' => 'required|max:225',
+            'repayment_frequency' => 'required',
+            'insurance_amount' => 'required|numeric',
             'interest_rate' => 'required|numeric|min:0',
             'tenure_months' => 'required|integer|min:1',
             'disbursed_at' => 'required|date',
             'status' => 'required|in:pending,active,closed',
         ]);
 
-        $loan->update($request->all());
+        $data['processing_fee'] = $data['processing_fee'] ?? 0;
+
+        $loan->update($data);
 
         return redirect()->route('loans.index')->with('success', 'Loan updated successfully!');
     }

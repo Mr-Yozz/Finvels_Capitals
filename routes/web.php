@@ -15,6 +15,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\BaseController;
+use App\Http\Controllers\InvoiceController;
 
 
 Route::get('/', [BaseController::class, 'base'])->name('base');
@@ -135,6 +136,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::resource('invoices', InvoiceController::class);
+
+// PDF download
+Route::get('invoices/{invoice}/pdf', [InvoiceController::class,'downloadPdf'])->name('invoices.pdf');
+
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

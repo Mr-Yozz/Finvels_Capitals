@@ -120,6 +120,16 @@ class RepaymentController extends Controller
         if ($request->has('group_id')) {
             $group = \App\Models\Group::with(['members.loans.repayments'])->findOrFail($request->group_id);
 
+            $repayments = collect();
+
+            foreach ($group->members as $member) {
+                foreach ($member->loans as $loan) {
+                    foreach ($loan->repayments as $r) {
+                        $repayments->push($r);
+                    }
+                }
+            }
+
             $members = $group->members->map(function ($member) {
                 $totalLoans = $member->loans->count();
                 $totalDue = $member->loans->sum(fn($loan) => $loan->repayments->where('status', 'due')->sum('amount'));

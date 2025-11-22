@@ -136,6 +136,7 @@
             <i class="bi bi-file-earmark-pdf-fill me-1"></i> Export PDF
         </a>
     </div>
+
     <div class="mb-3 d-flex gap-2">
 
         <a href="{{ route('repayments.index', ['loan_id' => $loan->id]) }}"

@@ -21,6 +21,8 @@
         @endforeach
     </div>
 
+    
+
     <div class="mt-3">
         {{ $groups->links('pagination::bootstrap-5') }}
     </div>

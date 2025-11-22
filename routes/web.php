@@ -16,6 +16,7 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\CollectionSheetController;
 
 
 Route::get('/', [BaseController::class, 'base'])->name('base');
@@ -143,6 +144,9 @@ Route::resource('invoices', InvoiceController::class);
 // Route::get('invoices/{invoice}/pdf', [InvoiceController::class,'downloadPdf'])->name('invoices.pdf');
 Route::get('/invoice/{id}/pdf', [LoanController::class, 'exportPdf_in'])->name('invoice.pdf');
 Route::get('/invoice/{id}/excel', [LoanController::class, 'exportExcel_in'])->name('invoice.excel');
+
+Route::get('/collection-sheet/{groupId}', [CollectionSheetController::class, 'index'])->name('collection.sheet');
+Route::get('/collection-sheet/{groupId}/pdf', [CollectionSheetController::class, 'exportPdf'])->name('collection.sheet.pdf');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

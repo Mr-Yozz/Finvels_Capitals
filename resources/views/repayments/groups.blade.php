@@ -18,10 +18,16 @@
                 </div>
             </a>
         </div>
+
+        <div class="mt-3">
+            <a href="{{ route('collection.sheet', ['groupId' => $group->id]) }}"
+                class="btn btn-primary btn-sm">
+                Full Repayments
+            </a>
+        </div>
         @endforeach
     </div>
 
-    
 
     <div class="mt-3">
         {{ $groups->links('pagination::bootstrap-5') }}

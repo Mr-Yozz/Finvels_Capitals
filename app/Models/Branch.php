@@ -18,9 +18,20 @@ class Branch extends Model
     {
         return $this->hasMany(Loan::class);
     }
+
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class, 'user_id');
+    // }
+
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function expenses()

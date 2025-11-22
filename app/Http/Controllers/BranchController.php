@@ -15,9 +15,16 @@ class BranchController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
+        $query = Branch::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('address', 'like', "%{$search}%");
+        }
         $branches = Branch::latest()->paginate(10);
         return view('branches.index', compact('branches'));
     }

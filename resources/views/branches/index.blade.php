@@ -103,6 +103,14 @@
         <a href="{{ route('branches.create') }}" class="btn btn-success shadow-sm">
             <i class="bi bi-plus-circle me-1"></i> Add Branch
         </a>
+
+        <form action="{{ route('branches.index') }}" method="GET" class="d-flex gap-2">
+            <input type="text" name="search" class="form-control form-control-sm" placeholder="Search branch..."
+                value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </form>
     </div>
 
     @if(session('success'))

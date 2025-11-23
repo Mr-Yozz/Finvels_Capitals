@@ -18,14 +18,14 @@ class BranchController extends Controller
     public function index(Request $request)
     {
         //
-        $query = Branch::query();
+        $search = $request->input('search');
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('address', 'like', "%{$search}%");
-        }
-        $branches = Branch::latest()->paginate(10);
+        $branches = Branch::when($search, function ($query) use ($search) {
+            $query->where('name', 'LIKE', "%{$search}%")
+                ->orWhere('address', 'LIKE', "%{$search}%");
+        })
+            ->orderBy('id', 'desc')
+            ->paginate(10);
         return view('branches.index', compact('branches'));
     }
 

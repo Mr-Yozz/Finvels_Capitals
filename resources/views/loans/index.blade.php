@@ -70,6 +70,10 @@
         <a href="{{ route('loans.create') }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Add Loan
         </a>
+
+        <div class="mb-3">
+            <input type="text" id="searchLoan" class="form-control" placeholder="Search loans...">
+        </div>
     </div>
 
     <div class="mb-3 d-flex gap-2">
@@ -150,4 +154,34 @@
 
 </div>
 
+@endsection
+
+@section('scripts')
+<script>
+    document.getElementById('searchLoan').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+        let visible = false;
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const match = text.includes(searchValue);
+            row.style.display = match ? '' : 'none';
+            if (match) visible = true;
+        });
+
+        // No records message
+        let noResultsRow = document.getElementById('noResultsRow');
+        if (!visible) {
+            if (!noResultsRow) {
+                const tbody = document.querySelector('table tbody');
+                tbody.insertAdjacentHTML('beforeend',
+                    `<tr id="noResultsRow"><td colspan="9" class="text-center py-3 text-muted">No matching loans found.</td></tr>`
+                );
+            }
+        } else if (noResultsRow) {
+            noResultsRow.remove();
+        }
+    });
+</script>
 @endsection

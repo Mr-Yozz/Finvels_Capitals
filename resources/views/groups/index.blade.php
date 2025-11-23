@@ -105,6 +105,10 @@
         <a href="{{ route('groups.create') }}" class="btn btn-success shadow-sm">
             <i class="bi bi-plus-circle me-1"></i> Add Group
         </a>
+
+        <form class="d-flex gap-2">
+            <input type="text" id="searchGroup" class="form-control form-control-sm" placeholder="Search groups...">
+        </form>
     </div>
 
     @if(session('success'))
@@ -166,9 +170,29 @@
         </table>
     </div>
 
+    <!-- <div class="d-flex justify-content-center mt-3">
+        {{ $groups->links('pagination::bootstrap-5') }}
+    </div> -->
+    @if(!request('search'))
     <div class="d-flex justify-content-center mt-3">
         {{ $groups->links('pagination::bootstrap-5') }}
     </div>
+    @endif
 </div>
+
+@endsection
+
+@section('scripts')
+<script>
+    document.getElementById('searchGroup').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#groupTable tbody tr');
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(searchValue) ? '' : 'none';
+        });
+    });
+</script>
 
 @endsection

@@ -41,7 +41,7 @@
     </div>
 
     <!-- repayments table -->
-    <div class="table-responsive bg-white shadow-sm p-3 rounded">
+    <!-- <div class="table-responsive bg-white shadow-sm p-3 rounded">
 
         <table class="table table-bordered text-center align-middle" style="font-size: 13px;">
             <thead class="table-light">
@@ -121,6 +121,6 @@
 
         </table>
 
-    </div>
+    </div> -->
 </div>
 @endsection

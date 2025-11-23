@@ -120,6 +120,9 @@
             <i class="bi bi-arrow-left"></i> Back to Loans
         </a>
     </div>
+    <div class="mb-3">
+        <input type="text" id="searchRepayment" class="form-control" placeholder="Search repayments...">
+    </div>
 
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -238,4 +241,35 @@
     </div>
 
 </div>
+@endsection
+@section('scripts')
+<script>
+    document.getElementById('searchRepayment').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#repaymentTable tbody tr');
+        let hasVisible = false;
+
+        rows.forEach(row => {
+            const rowText = row.innerText.toLowerCase();
+            const match = rowText.includes(searchValue);
+            row.style.display = match ? '' : 'none';
+            if (match) hasVisible = true;
+        });
+
+        // Handle "No results"
+        let emptyRow = document.getElementById('noResultsRow');
+        if (!hasVisible) {
+            if (!emptyRow) {
+                const tbody = document.querySelector('#repaymentTable tbody');
+                tbody.insertAdjacentHTML('beforeend',
+                    `<tr id="noResultsRow"><td colspan="11" class="text-center text-muted py-3">
+                    No matching repayments found.</td></tr>`
+                );
+            }
+        } else if (emptyRow) {
+            emptyRow.remove();
+        }
+    });
+</script>
+
 @endsection

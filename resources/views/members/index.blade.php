@@ -64,6 +64,10 @@
         <a href="{{ route('members.create') }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Add Member
         </a>
+
+        <div class="mb-3">
+            <input type="text" id="searchMember" class="form-control" placeholder="Search members...">
+        </div>
     </div>
 
     <div class="mb-3 d-flex gap-2">
@@ -132,5 +136,36 @@
 
 </div>
 
+@endsection
+
+@section('scripts')
+<script>
+    document.getElementById('searchMember').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+
+        let visible = false;
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const match = text.includes(searchValue);
+            row.style.display = match ? '' : 'none';
+            if (match) visible = true;
+        });
+
+        // Show/Hide "No members found" dynamic message
+        let noDataRow = document.getElementById('noResultsRow');
+        if (!visible) {
+            if (!noDataRow) {
+                const tableBody = document.querySelector('table tbody');
+                tableBody.insertAdjacentHTML('beforeend',
+                    `<tr id="noResultsRow"><td colspan="8" class="text-center py-4 text-muted">No matching records found.</td></tr>`
+                );
+            }
+        } else if (noDataRow) {
+            noDataRow.remove();
+        }
+    });
+</script>
 
 @endsection

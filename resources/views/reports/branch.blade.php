@@ -49,6 +49,12 @@
             <i class="bi bi-arrow-left me-1"></i> Back
         </a>
     </div>
+    <div class="d-flex gap-2 mb-3" style="max-width: 350px;">
+        <input type="text" id="searchInput" class="form-control form-control-sm"
+            placeholder="Search by branch name or amount...">
+    </div>
+
+
 
     <div class="mb-3 d-flex gap-2">
         <a href="{{ route('reports.branch.export.excel') }}" class="btn btn-success btn-sm">
@@ -97,5 +103,19 @@
         </div>
     </div>
 </div>
+
+@endsection
+@section('scripts')
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(value) ? "" : "none";
+        });
+    });
+</script>
 
 @endsection

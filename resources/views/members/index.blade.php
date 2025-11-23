@@ -61,9 +61,9 @@
         <h2 class="fw-bold text-primary mb-0">
             <i class="bi bi-people-fill me-2"></i> Members
         </h2>
-        <a href="{{ route('members.create') }}" class="btn btn-primary shadow-sm">
+        <!-- <a href="{{ route('members.create') }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Add Member
-        </a>
+        </a> -->
 
         <div class="mb-3">
             <input type="text" id="searchMember" class="form-control" placeholder="Search members...">

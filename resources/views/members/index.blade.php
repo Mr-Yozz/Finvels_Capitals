@@ -97,7 +97,8 @@
                 <tbody>
                     @forelse($members as $member)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <!-- <td>{{ $loop->iteration }}</td> -->
+                        <td>{{ $member->member_id }}</td>
                         <td class="fw-semibold">{{ $member->name }}</td>
                         <td>{{ $member->mobile }}</td>
                         <td>{{ $member->aadhaar_encrypted }}</td>

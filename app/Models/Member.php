@@ -29,6 +29,17 @@ class Member extends Model
         return $this->belongsTo(User::class);
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($member) {
+            $lastMember = Member::orderBy('id', 'desc')->first();
+            $nextId = $lastMember ? ($lastMember->id + 1) : 1;
+            $member->member_id = 'M' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
+        });
+    }
+
     public function scopeAccessibleBy($query, $user)
     {
         if ($user->role === 'admin') return $query;

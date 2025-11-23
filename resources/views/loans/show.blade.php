@@ -168,7 +168,7 @@
         <div>
             <div class="field-row">
                 <div class="label">Member ID :</div>
-                <div class="value">{{ $loan->member->member_no ?? '-' }}</div>
+                <div class="value">{{ $loan->member->member_id ?? '-' }}</div>
             </div>
             <div class="field-row">
                 <div class="label">Kendra Name :</div>

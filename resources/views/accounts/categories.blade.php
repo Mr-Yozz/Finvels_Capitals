@@ -8,6 +8,12 @@
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    <div class="d-flex justify-content-end mb-3" style="max-width: 300px;">
+        <input type="text" id="searchCategory" class="form-control"
+            placeholder="Search categories...">
+    </div>
+
+
     <form action="{{ route('account.categories.store') }}" method="POST" class="mb-3">
         @csrf
         <div class="row g-2">
@@ -28,6 +34,7 @@
             </div>
         </div>
     </form>
+
 
     <table class="table table-bordered align-middle">
         <thead class="table-light">
@@ -57,4 +64,18 @@
         </tbody>
     </table>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.getElementById("searchCategory").addEventListener("keyup", function() {
+        let searchValue = this.value.toLowerCase();
+        let rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            let rowText = row.innerText.toLowerCase();
+            row.style.display = rowText.includes(searchValue) ? "" : "none";
+        });
+    });
+</script>
 @endsection

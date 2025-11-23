@@ -9,8 +9,12 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
     @endif
+
+    <div class="d-flex justify-content-end mb-3" style="max-width: 350px;">
+        <input type="text" id="searchExpense" class="form-control" placeholder="Search expenses...">
+    </div>
 
     <div class="table-responsive shadow-sm bg-white p-3 rounded-3">
         <table class="table table-bordered table-hover align-middle">
@@ -50,7 +54,9 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center">No records found</td></tr>
+                <tr>
+                    <td colspan="6" class="text-center">No records found</td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
@@ -74,7 +80,7 @@
                         <select name="category_id" class="form-select" required>
                             <option value="">Select</option>
                             @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -124,7 +130,7 @@
                         <label class="form-label">Category</label>
                         <select name="category_id" id="editCategory" class="form-select" required>
                             @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -181,25 +187,34 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.editBtn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            document.getElementById('editExpenseForm').action = '/expenses/' + id;
-            document.getElementById('editCategory').value = this.dataset.category;
-            document.getElementById('editAmount').value = this.dataset.amount;
-            document.getElementById('editMode').value = this.dataset.mode;
-            document.getElementById('editDate').value = this.dataset.date;
-            document.getElementById('editDescription').value = this.dataset.description;
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.editBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                document.getElementById('editExpenseForm').action = '/expenses/' + id;
+                document.getElementById('editCategory').value = this.dataset.category;
+                document.getElementById('editAmount').value = this.dataset.amount;
+                document.getElementById('editMode').value = this.dataset.mode;
+                document.getElementById('editDate').value = this.dataset.date;
+                document.getElementById('editDescription').value = this.dataset.description;
+            });
         });
-    });
 
-    document.querySelectorAll('.deleteBtn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            document.getElementById('deleteExpenseForm').action = '/expenses/' + id;
+        document.querySelectorAll('.deleteBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                document.getElementById('deleteExpenseForm').action = '/expenses/' + id;
+            });
         });
     });
-});
+    document.getElementById("searchExpense").addEventListener("keyup", function() {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(value) ? "" : "none";
+        });
+    });
 </script>
 @endsection

@@ -83,6 +83,13 @@ class MemberController extends Controller
 
         $member->update($request->all());
 
+        // Also update related user name
+        if ($member->user) {
+            $member->user->update([
+                'name' => $request->name,
+            ]);
+        }
+
         return redirect()->route('members.index')->with('success', 'Member updated successfully!');
     }
 

@@ -14,6 +14,22 @@
             <small class="text-danger">{{ $message }}</small>
             @enderror
         </div>
+
+        <div class="mb-3">
+            <label class="form-label text-primary">Select Branch Manager</label>
+            <select name="user_id" class="form-select" required>
+                <option value="">-- Select Manager --</option>
+                @foreach($managers as $manager)
+                <option value="{{ $manager->id }}">
+                    {{ $manager->name }} ({{ $manager->mobile ?? 'No Mobile' }})
+                </option>
+                @endforeach
+            </select>
+            @error('user_id')
+            <small class="text-danger">{{ $message }}</small>
+            @enderror
+        </div>
+
         <div class="mb-3">
             <label for="address" class="form-label text-primary">Address</label>
             <textarea id="address" name="address" rows="4" placeholder="123 Main St, City, State, ZIP, Country" value="{{ old('address', $branch->address) }}" required></textarea>

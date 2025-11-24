@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Branch extends Model
 {
     //
-    protected $fillable = ['name', 'address'];
+    protected $fillable = ['name', 'address', 'user_id'];
     public function groups()
     {
         return $this->hasMany(Group::class);

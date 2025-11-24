@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\BranchesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BranchReportExport;
+use App\Models\User;
 
 use App\Models\Branch;
 
@@ -26,7 +27,8 @@ class BranchController extends Controller
         })
             ->orderBy('id', 'desc')
             ->paginate(10);
-        return view('branches.index', compact('branches'));
+        $managers = User::where('role', 'manager')->get();
+        return view('branches.index', compact('branches', 'managers'));
     }
 
     /**
@@ -35,7 +37,8 @@ class BranchController extends Controller
     public function create()
     {
         //
-        return view('branches.create');
+        $managers = User::where('role', 'manager')->get();
+        return view('branches.create', compact('managers'));
     }
 
     /**
@@ -44,8 +47,21 @@ class BranchController extends Controller
     public function store(Request $request)
     {
         //
-        $request->validate(['name' => 'required|string|max:255']);
-        Branch::create($request->all());
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+        ]);
+        $branch = Branch::create([
+            'name' => $request->name,
+            'address' => $request->address,
+            'user_id' => $request->user_id,
+        ]);
+
+        // update user role assignment
+        User::where('id', $request->user_id)->update([
+            'branch_id' => $branch->id
+        ]);
         return redirect()->route('branches.index')->with('success', 'Branch created!');
     }
 
@@ -66,7 +82,8 @@ class BranchController extends Controller
     {
         //
         $branch = Branch::findOrFail($id);
-        return view('branches.edit', compact('branch'));
+        $managers = User::where('role', 'manager')->get();
+        return view('branches.edit', compact('branch', 'managers'));
     }
 
     /**
@@ -75,9 +92,29 @@ class BranchController extends Controller
     public function update(Request $request, $id)
     {
         //
-        $request->validate(['name' => 'required|string|max:255']);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+        ]);
 
         $branch = Branch::findOrFail($id);
+
+        if ($branch->user_id && $branch->user_id != $request->user_id) {
+            User::where('id', $branch->user_id)->update(['branch_id' => null]);
+        }
+
+        // Update branch details
+        $branch->update([
+            'name' => $request->name,
+            'address' => $request->address,
+            'user_id' => $request->user_id,
+        ]);
+
+        // Assign new manager to this branch
+        User::where('id', $request->user_id)->update([
+            'branch_id' => $branch->id,
+        ]);
 
         $branch->update($request->all());
         return redirect()->route('branches.index')->with('success', 'Branch updated!');

@@ -25,9 +25,9 @@
     <table style="width:100%; border-collapse: collapse; margin-bottom: 15px;">
         <tr>
             <td><strong>Member ID:</strong></td>
-            <td>{{ $invoice->loan->member->id ?? '-' }}</td>
+            <td>{{ $invoice->loan->member->member_id ?? '-' }}</td>
 
-            <td><strong>Kendra Name:</strong></td>
+            <td><strong>Branch Name:</strong></td>
             <td>{{ $invoice->loan->branch->name ?? '-' }}</td>
         </tr>
 
@@ -60,7 +60,7 @@
             <td>{{ $invoice->loan->spousename ?? '-' }}</td>
 
             <td><strong>Loan Amount:</strong></td>
-            <td>₹ {{ number_format($invoice->loan->principal,2) }}</td>
+            <td> {{ number_format($invoice->loan->principal,2) }}</td>
         </tr>
 
         <tr>

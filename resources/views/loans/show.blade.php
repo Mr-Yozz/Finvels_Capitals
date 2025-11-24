@@ -171,7 +171,7 @@
                 <div class="value">{{ $loan->member->member_id ?? '-' }}</div>
             </div>
             <div class="field-row">
-                <div class="label">Kendra Name :</div>
+                <div class="label">Branch Name :</div>
                 <div class="value">{{ $loan->branch->name ?? '-' }}</div>
             </div>
             <div class="field-row">

@@ -298,8 +298,8 @@
     </div>
 
     <div class="sign-row">
-        <div class="sign-item">Kendra Leader</div>
-        <div class="sign-item">Kendra</div>
+        <div class="sign-item">Branch Leader</div>
+        <div class="sign-item">Branch</div>
         <div class="sign-item">Cashier</div>
     </div>
 

@@ -159,8 +159,8 @@
         <table class="table table-hover align-middle table-bordered" id="repaymentTable">
             <thead class="table-light text-nowrap">
                 <tr>
-                    <th>ID</th>
-                    <th>Loan</th>
+                    <th>No</th>
+                    <th>Member ID</th>
                     <th>Due Date</th>
                     <th>EMI Amount</th>
                     <th>Principal</th>
@@ -176,7 +176,7 @@
                 @forelse($repayments as $index => $repayment)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>#{{ $repayment->loan->id ?? '-' }}</td>
+                    <td>#{{ $repayment->loan->member->member_id ?? '-' }}</td>
                     <td>{{ $repayment->due_date->format('d M Y') }}</td>
                     <td>₹{{ number_format($repayment->amount, 2) }}</td>
 

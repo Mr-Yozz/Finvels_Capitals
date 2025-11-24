@@ -11,7 +11,7 @@
         <table class="table table-hover align-middle table-bordered">
             <thead class="table-light">
                 <tr>
-                    <th>ID</th>
+                    <th>Member ID</th>
                     <th>Branch</th>
                     <th>Principal</th>
                     <th>Interest Rate</th>

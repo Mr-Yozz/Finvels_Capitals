@@ -23,7 +23,7 @@
             <tbody>
                 @forelse ($loans as $loan)
                 <tr>
-                    <td>#{{ $loan->id }}</td>
+                    <td>#{{ $loan->member->member_id }}</td>
                     <td>{{ $loan->branch->name ?? '-' }}</td>
                     <td>₹{{ number_format($loan->principal, 2) }}</td>
                     <td>{{ $loan->interest_rate }}%</td>

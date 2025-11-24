@@ -2,12 +2,6 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
-    /* -------- Container -------- */
-    .container {
-        max-width: 100%;
-        padding: 15px;
-    }
-
     /* -------- Table Styling -------- */
     #repaymentTable {
         border-collapse: separate;

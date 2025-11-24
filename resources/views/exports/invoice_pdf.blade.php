@@ -57,7 +57,7 @@
 
         <tr>
             <td><strong>Spouse Name:</strong></td>
-            <td>{{ $invoice->loan->member->spouse_name ?? '-' }}</td>
+            <td>{{ $invoice->loan->spousename ?? '-' }}</td>
 
             <td><strong>Loan Amount:</strong></td>
             <td>₹ {{ number_format($invoice->loan->principal,2) }}</td>
@@ -81,7 +81,7 @@
 
         <tr>
             <td><strong>Phone:</strong></td>
-            <td>{{ $invoice->loan->member->phone ?? '-' }}</td>
+            <td>{{ $invoice->loan->member->mobile ?? '-' }}</td>
 
             <td><strong>Invoice Date:</strong></td>
             <td>{{ $invoice->created_at->format('d M Y') }}</td>

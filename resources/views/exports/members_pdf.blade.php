@@ -44,6 +44,9 @@
                 <th>PAN</th>
                 <th>Group</th>
                 <th>Branch</th>
+                <th>Bank Name</th>
+                <th>Account No</th>
+                <th>IFSC Code</th>
             </tr>
         </thead>
         <tbody>
@@ -56,6 +59,9 @@
                 <td>{{ $member->pan_encrypted }}</td>
                 <td>{{ $member->group->name ?? '-' }}</td>
                 <td>{{ $member->group->branch->name ?? '-' }}</td>
+                <td>{{ $member->bank_name ?? '-' }}</td>
+                <td>{{ $member->account_number ?? '-' }}</td>
+                <td>{{ $member->ifsc_code ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>

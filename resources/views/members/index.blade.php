@@ -91,6 +91,9 @@
                         <th>PAN</th>
                         <th>Group</th>
                         <th>Branch</th>
+                        <th>Bank Name</th>
+                        <th>Account No</th>
+                        <th>IFSC Code</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -105,6 +108,10 @@
                         <td>{{ $member->pan_encrypted }}</td>
                         <td>{{ $member->group->name ?? '-' }}</td>
                         <td>{{ $member->group->branch->name ?? '-' }}</td>
+                        <td>{{ $member->bank_name ?? '-' }}</td>
+                        <td>{{ $member->account_number ?? '-' }}</td>
+                        <td>{{ $member->ifsc_code ?? '-' }}</td>
+                        <!-- <td>{{ $member->group->branch->name ?? '-' }}</td> -->
                         <td class="text-center">
                             <a href="{{ route('members.show', $member->id) }}" class="btn btn-outline-secondary btn-sm me-1">
                                 <i class="bi bi-eye"></i>

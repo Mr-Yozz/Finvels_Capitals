@@ -104,5 +104,12 @@
 
 
 @section('scripts')
-@vite(['resources/js/dashboard-charts.js'])
+@php
+$manifestPath = public_path('build/manifest.json');
+$manifest = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : [];
+@endphp
+
+@if(!empty($manifest['resources/js/dashboard-charts.js']))
+<script type="module" src="{{ asset('build/' . $manifest['resources/js/dashboard-charts.js']['file']) }}"></script>
+@endif
 @endsection

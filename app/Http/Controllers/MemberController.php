@@ -40,7 +40,10 @@ class MemberController extends Controller
             'name' => 'required|string|max:255',
             'mobile' => 'required|string|max:20',
             'aadhaar_encrypted' => 'required|string',
-            'pan_encrypted' => 'required|string',
+            'bank_name' => 'nullable|string',
+            'account_number' => 'required|string',
+            'branch_name' => 'nullabel|string',
+            'ifsc_code' => 'required|string|max:50',
             'group_id' => 'required|exists:groups,id',
         ]);
 
@@ -78,6 +81,10 @@ class MemberController extends Controller
             'mobile' => 'required|string|max:20',
             'aadhaar_encrypted' => 'required|string',
             'pan_encrypted' => 'required|string',
+            'bank_name' => 'nullable|string',
+            'account_number' => 'required|string|max:25',
+            'branch_name' => 'nullable|string',
+            'ifsc_code' => 'required|string|max:50',
             'group_id' => 'required|exists:groups,id',
         ]);
 

@@ -54,7 +54,7 @@
 
             <div class="mb-3">
                 <label>Select Branch</label>
-                <select name="branch_name" class="form-select" required>
+                <select name="branch_id" class="form-select" required>
                     <option value="">-- Choose --</option>
                     @foreach(\App\Models\Branch::all() as $g)
                     <option value="{{ $g->id }}">{{ $g->name }}</option>

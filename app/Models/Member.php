@@ -11,7 +11,7 @@ class Member extends Model
     //
     use EncryptsAttributes;
     use Notifiable;
-    protected $fillable = ['group_id', 'name', 'mobile', 'aadhaar_encrypted', 'pan_encrypted', 'bank_name', 'account_number', 'ifsc_code', 'branch_name', 'branch_address'];
+    protected $fillable = [ 'user_id','group_id', 'name', 'mobile', 'aadhaar_encrypted', 'pan_encrypted', 'bank_name', 'account_number', 'ifsc_code', 'branch_name', 'branch_address'];
     protected $encrypts = ['aadhaar_encrypted', 'pan_encrypted']; // trait reads this
 
     public function group()

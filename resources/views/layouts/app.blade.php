@@ -125,9 +125,9 @@
                         <a class="nav-link" href="{{ route('users.create') }}">Create Manager</a>
                     </li>
                     @elseif(Auth::user()->role === 'manager')
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{{ route('users.create') }}">Create User</a>
-                    </li>
+                    </li> -->
                     @endif
 
                     <li class="nav-item dropdown">

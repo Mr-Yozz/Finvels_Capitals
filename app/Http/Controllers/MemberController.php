@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 
@@ -81,9 +82,10 @@ class MemberController extends Controller
             'name' => 'required|string|max:255',
             'mobile' => 'required|string|max:20',
             'aadhaar_encrypted' => 'required|string',
+            'pan_encrypted' => 'required|string',
             'bank_name' => 'nullable|string',
             'account_number' => 'required|string',
-            'branch_name' => 'nullable|string',
+            'branch_id' => 'required|exists:branches,id',
             'ifsc_code' => 'required|string|max:50',
             'group_id' => 'required|exists:groups,id',
         ]);
@@ -108,38 +110,56 @@ class MemberController extends Controller
     {
         $request->validate(['otp' => 'required']);
 
-        if ($request->otp == session('otp')) {
-
-            // Retrieve stored form data
-            $data = session('form_data');
-
-            // Member::create($data);
-
-            $member = Member::create($data);
-
-            $email = $data['name'] . $data['mobile'] . '@member.local'; // <-- use session data
-
-            $user = User::create([
-                'name' => $data['name'],
-                'phone' => $data['mobile'],
-                'email' => $email,
-                'password' => Hash::make('123456'),
-                'role' => 'user'
-            ]);
-
-            // OPTIONAL: Link user_id in Member table if column exists
-            if ($member->fillable && in_array('user_id', $member->getFillable())) {
-                $member->update(['user_id' => $user->id]);
-            }
-
-            // Clear session
-            session()->forget(['otp', 'form_data']);
-
-            return redirect()->route('members.create')->with('success', 'Member created successfully!');
+        if ($request->otp != session('otp')) {
+            return back()->with('error', 'Invalid OTP');
         }
 
-        return back()->with('error', 'Invalid OTP');
+        $data = session('form_data');
+
+        DB::beginTransaction();
+
+        try {
+
+            // Create user first
+            $email = $data['mobile'] . '@member.local';
+
+            $user = User::create([
+                'name'      => $data['name'],
+                'phone'     => $data['mobile'],
+                'email'     => $email,
+                'password'  => Hash::make('123456'),
+                'role'      => 'user',
+                'branch_id' => $data['branch_id'],
+            ]);
+
+            // Create member
+            $member = Member::create([
+                'name'              => $data['name'],
+                'mobile'            => $data['mobile'],
+                'aadhaar_encrypted' => $data['aadhaar_encrypted'],
+                'pan_encrypted'     => $data['pan_encrypted'],
+                'bank_name'         => $data['bank_name'],
+                'account_number'    => $data['account_number'],
+                'branch_id'         => $data['branch_id'],
+                'ifsc_code'         => $data['ifsc_code'],
+                'group_id'          => $data['group_id'],
+                'user_id'           => $user->id,   // LINK HERE
+            ]);
+
+            DB::commit();
+
+            session()->forget(['otp', 'form_data']);
+
+            return redirect()->route('members.create')
+                ->with('success', 'Member created successfully!');
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
+
+
 
     public function resendOtp(Request $request, OtpService $otpService)
     {

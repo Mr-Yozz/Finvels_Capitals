@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'branch_id',
     ];
 
     /**
@@ -57,16 +58,16 @@ class User extends Authenticatable
         return $this->hasOne(Member::class);
     }
 
-    protected static function booted()
-    {
-        static::created(function ($user) {
-            if ($user->role === 'user' && !$user->member) {
-                $user->member()->create([
-                    'name' => $user->name,
-                    // optionally add defaults:
-                    // 'mobile' => $user->mobile ?? null,
-                ]);
-            }
-        });
-    }
+    // protected static function booted()
+    // {
+    //     static::created(function ($user) {
+    //         if ($user->role === 'user' && !$user->member) {
+    //             $user->member()->create([
+    //                 'name' => $user->name,
+    //                 // optionally add defaults:
+    //                 // 'mobile' => $user->mobile ?? null,
+    //             ]);
+    //         }
+    //     });
+    // }
 }

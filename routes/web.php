@@ -82,6 +82,12 @@ Route::prefix('group')->controller(GroupController::class)->group(function () {
     Route::get('groups/export/pdf', [GroupController::class, 'exportPdf'])->name('groups.export.pdf');
 });
 
+
+Route::post('/member/send-otp', [MemberController::class, 'sendOtp'])->name('members.sendOtp');
+Route::post('/member/verify-otp', [MemberController::class, 'verifyOtp'])->name('members.verifyOtp');
+Route::post('/members/resend-otp', [MemberController::class, 'resendOtp'])->name('members.resendOtp');
+
+
 Route::prefix('member')->name('members.')->controller(MemberController::class)->group(function () {
     Route::get('members/', 'index')->name('index');
     Route::get('members/create', 'create')->name('create');
@@ -93,6 +99,9 @@ Route::prefix('member')->name('members.')->controller(MemberController::class)->
     Route::get('members/export/excel', [MemberController::class, 'exportExcel'])->name('export.excel');
     Route::get('members/export/pdf', [MemberController::class, 'exportPdf'])->name('export.pdf');
 });
+
+
+
 
 Route::prefix('loan')->name('loans.')->controller(LoanController::class)->group(function () {
 

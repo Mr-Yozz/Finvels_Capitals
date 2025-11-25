@@ -115,6 +115,15 @@ Route::get('repayments/export/excel', [RepaymentController::class, 'exportExcelR
 Route::get('reports/daily/export/excel', [RepaymentController::class, 'exportExcelDailyReport'])->name('reports.daily.export.excel');
 Route::get('reports/daily/export/pdf', [RepaymentController::class, 'exportPdfDailyReport'])->name('reports.daily.export.pdf');
 
+Route::get('/group-members', function (Illuminate\Http\Request $request) {
+    $members = \App\Models\Member::where('group_id', $request->group_id)
+        ->select('id', 'name', 'member_id')
+        ->orderBy('name')
+        ->get();
+
+    return response()->json($members);
+});
+
 Route::get('reports/branch/export/excel', [RepaymentController::class, 'exportExcelBranchReport'])->name('reports.branch.export.excel');
 Route::get('reports/branch/export/pdf', [RepaymentController::class, 'exportPdfBranchReport'])->name('reports.branch.export.pdf');
 

@@ -150,6 +150,16 @@ class RepaymentController extends Controller
             return view('repayments.group_members', compact('group', 'members'));
         }
 
+        // CASE: Search by member name
+        if ($request->has('member_name') && $request->member_name != '') {
+            $members = \App\Models\Member::where('name', 'LIKE', '%' . $request->member_name . '%')
+                ->withCount('loans')
+                ->paginate(12);
+
+            return view('repayments.search_members', compact('members'));
+        }
+
+
         // CASE 4: Default — show all groups first
         $groups = \App\Models\Group::orderBy('name', 'asc')->paginate(12);
 

@@ -44,8 +44,6 @@
             @error('account_number') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
-
-
         <div class="mb-3">
             <label class="form-label text-primary">IFSC Code</label>
             <input type="text" name="ifsc_code" class="form-control" value="{{ old('ifsc_code', $member->ifsc_code) }}" required>

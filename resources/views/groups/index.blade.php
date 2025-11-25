@@ -101,11 +101,16 @@
 @section('content')
 <div class="container my-4">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-        <h2 class="text-primary fw-bold mb-2 mb-md-0">Groups</h2>
-        <a href="{{ route('groups.create') }}" class="btn btn-success shadow-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add Group
-        </a>
+        <div class="d-flex align-items-center gap-2 mb-2 mb-md-0">
+            <h2 class="text-primary fw-bold mb-2 mb-md-0">Groups</h2>
+            <a href="{{ route('groups.create') }}" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Add Group
+            </a>
+            <button class="btn btn-secondary btn-sm shadow-sm" onclick="history.back()">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
 
+        </div>
         <form class="d-flex gap-2">
             <input type="text" id="searchGroup" class="form-control form-control-sm" placeholder="Search groups...">
         </form>

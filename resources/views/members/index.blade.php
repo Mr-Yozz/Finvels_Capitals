@@ -58,13 +58,17 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary mb-0">
-            <i class="bi bi-people-fill me-2"></i> Members
-        </h2>
-        <!-- <a href="{{ route('members.create') }}" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Add Member
-        </a> -->
-
+        <div class="d-flex align-items-center gap-2 mb-2 mb-md-0">
+            <h2 class="fw-bold text-primary mb-0">
+                <i class="bi bi-people-fill me-2"></i> Members
+            </h2>
+            <a href="{{ route('members.create') }}" class="btn btn-primary shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Add Member
+            </a>
+            <button class="btn btn-secondary btn-sm shadow-sm" onclick="history.back()">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
+        </div>
         <div class="mb-3">
             <input type="text" id="searchMember" class="form-control" placeholder="Search members...">
         </div>

@@ -4,6 +4,38 @@
 <div class="container py-4">
     <h4 class="mb-4">📋 Groups</h4>
 
+    <form class="mb-3">
+        <div class="row g-2 align-items-end">
+
+            <!-- Group Filter -->
+            <div class="col-md-3">
+                <label class="form-label">Select Group</label>
+                <select id="groupSelect" name="group_id" class="form-select">
+                    <option value="">-- All Groups --</option>
+                    @foreach($groups as $grp)
+                    <option value="{{ $grp->id }}">{{ $grp->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Member Filter (Dynamic) -->
+            <div class="col-md-3">
+                <label class="form-label">Select Member</label>
+                <select id="memberSelect" name="member_id" class="form-select" disabled>
+                    <option value="">-- Select Member --</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+            </div>
+        </div>
+    </form>
+
+
+
     <div class="row g-3">
         @foreach($groups as $group)
         <div class="col-md-3">
@@ -41,4 +73,37 @@
         transition: 0.2s;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.getElementById('groupSelect').addEventListener('change', function() {
+        let groupId = this.value;
+        let memberSelect = document.getElementById('memberSelect');
+
+        memberSelect.innerHTML = '<option value="">Loading...</option>';
+        memberSelect.disabled = true;
+
+        if (!groupId) {
+            memberSelect.innerHTML = '<option value="">-- Select Member --</option>';
+            return;
+        }
+
+        fetch(`/group-members?group_id=${groupId}`)
+            .then(res => res.json())
+            .then(data => {
+                memberSelect.innerHTML = '<option value="">-- Select Member --</option>';
+
+                data.forEach(member => {
+                    let opt = document.createElement('option');
+                    opt.value = member.id;
+                    opt.textContent = `${member.name} (${member.member_id})`;
+                    memberSelect.appendChild(opt);
+                });
+
+                memberSelect.disabled = false;
+            });
+    });
+</script>
+
 @endsection

@@ -8,6 +8,8 @@ use App\Models\Branch;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Exports\MembersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
@@ -47,7 +49,23 @@ class MemberController extends Controller
             'group_id' => 'required|exists:groups,id',
         ]);
 
-        Member::create($request->all());
+        $member = Member::create($request->all());
+
+        $email = $request->name . $request->mobile . '@member.local'; // add default mail to create
+
+        $user = User::create([
+            'name' => $request->name,
+            'phone' => $request->mobile,
+            'email' => $email,
+            'password' => Hash::make('123456'), // Default Password
+            'role' => 'user'
+        ]);
+
+        // OPTIONAL: Link user_id in Member table if column exists
+        if ($member->fillable && in_array('user_id', $member->getFillable())) {
+            $member->update(['user_id' => $user->id]);
+        }
+
 
         return redirect()->route('members.index')->with('success', 'Member created successfully!');
     }

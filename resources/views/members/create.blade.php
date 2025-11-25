@@ -38,7 +38,7 @@
             </div>
 
             <div class="mb-3">
-                <label>Pan</label>
+                <label>PAN</label>
                 <input type="text" name="pan_encrypted" class="form-control" required>
             </div>
 

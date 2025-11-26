@@ -17,8 +17,8 @@
 
     <div class="card p-4">
         <h5 class="fw-bold mb-3">Enter Member Details</h5>
-
-        <form action="{{ route('members.sendOtp') }}" method="POST">
+        <!-- route('members.sendOtp') -->
+        <form action="{{ route('members.store') }}" method="POST"> 
             @csrf
 
             <div class="mb-3">

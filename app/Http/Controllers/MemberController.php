@@ -43,19 +43,6 @@ class MemberController extends Controller
     // public function store(Request $request)
     // {
 
-    //     $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'mobile' => 'required|string|max:20',
-    //         'aadhaar_encrypted' => 'required|string',
-    //         'bank_name' => 'nullable|string',
-    //         'account_number' => 'required|string',
-    //         'branch_name' => 'nullabel|string',
-    //         'ifsc_code' => 'required|string|max:50',
-    //         'group_id' => 'required|exists:groups,id',
-    //     ]);
-
-    //     $member = Member::create($request->all());
-
     //     $email = $request->name . $request->mobile . '@member.local'; // add default mail to create
 
     //     $user = User::create([
@@ -66,15 +53,72 @@ class MemberController extends Controller
     //         'role' => 'user'
     //     ]);
 
+    //     $data = $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'mobile' => 'required|string|max:20',
+    //         'aadhaar_encrypted' => 'required|string',
+    //         'pan_encrypted' => 'required|string',
+    //         'bank_name' => 'nullable|string',
+    //         'account_number' => 'required|string',
+    //         'branch_name' => 'nullable|string',
+    //         'ifsc_code' => 'required|string|max:50',
+    //         'group_id' => 'required|exists:groups,id',
+    //     ]);
+
+    //     // manually add user id
+    //     // $data['user_id'] = $user->id;
+
+
+    //     $member = Member::create($request->all());
+
     //     // OPTIONAL: Link user_id in Member table if column exists
     //     if ($member->fillable && in_array('user_id', $member->getFillable())) {
     //         $member->update(['user_id' => $user->id]);
     //     }
 
-    //     // session()->forget(['otp', 'otp_mobile', 'otp_verified']);
 
-    //     return redirect()->route('members.index')->with('success', 'Member created successfully!');
+
+    //     // return redirect()->route('members.index')->with('success', 'Member created successfully!');
+    //     return redirect()->route('members.create')
+    //         ->with('success', 'Member created successfully!');
     // }
+
+    public function store(Request $request)
+    {
+        $email = $request->name . $request->mobile . '@member.local';
+
+        // Create related User
+        $user = User::create([
+            'name' => $request->name,
+            'phone' => $request->mobile,
+            'email' => $email,
+            'password' => Hash::make('123456'),
+            'role' => 'user'
+        ]);
+
+        // Validate only allowed fields
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'mobile' => 'required|string|max:20',
+            'aadhaar_encrypted' => 'required|string',
+            'pan_encrypted' => 'required|string',
+            'bank_name' => 'nullable|string',
+            'account_number' => 'required|string',
+            'branch_name' => 'nullable|string',
+            'ifsc_code' => 'required|string|max:50',
+            'group_id' => 'required|exists:groups,id',
+        ]);
+
+        // Add missing column (user_id) if your Member table has user_id
+        $data['user_id'] = $user->id;
+
+        // Create member only with validated data
+        $member = Member::create($data);
+
+        return redirect()->route('members.create')
+            ->with('success', 'Member created successfully!');
+    }
+
 
     public function sendOtp(Request $request, OtpService $otpService)
     {
@@ -158,8 +202,6 @@ class MemberController extends Controller
             return back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
-
-
 
     public function resendOtp(Request $request, OtpService $otpService)
     {

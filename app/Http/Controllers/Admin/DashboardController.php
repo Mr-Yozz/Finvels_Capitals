@@ -10,12 +10,22 @@ use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $notifications = [];
+
+        if (Auth::check()) {
+            $notifications = DatabaseNotification::where('notifiable_id', Auth::id())
+                ->where('notifiable_type', get_class(Auth::user()))
+                ->whereNull('read_at')
+                ->latest()
+                ->get();
+        }
         $today = Carbon::today();
         $nextWeek = Carbon::today()->addDays(7);
 
@@ -80,12 +90,14 @@ class DashboardController extends Controller
             'branchWise',
             'repaymentTrend',
             'recentLoans',
-            'recentLogs'
+            'recentLogs',
+            'notifications'
         ));
         // return view('admin.dashboard', compact('totalLoans', 'totalRepayments'));
     }
 
-    public function user(){
+    public function user()
+    {
 
         return view('admin.user');
     }

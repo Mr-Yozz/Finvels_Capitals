@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Notification extends Model
+class CustomNotification extends Model
 {
-    protected $fillable = ['branch_id', 'user_id', 'repayment_id', 'type', 'title', 'message', 'is_read'];
+    protected $fillable = ['branch_id','loan_id', 'user_id', 'repayment_id', 'type', 'title', 'message', 'is_read', 'title'];
 
     public function repayment()
     {

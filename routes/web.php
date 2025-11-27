@@ -116,6 +116,14 @@ Route::prefix('loan')->name('loans.')->controller(LoanController::class)->group(
     Route::get('loans/export/pdf', [LoanController::class, 'exportPdf'])->name('export.pdf');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('loan-requests/{id}', [LoanController::class, 'show_admin'])->name('loan-requests.show');
+    Route::post('loan-requests/{id}/approve', [LoanController::class, 'approve'])->name('loan-requests.approve');
+    Route::post('loan-requests/{id}/reject', [LoanController::class, 'reject'])->name('loan-requests.reject');
+});
+
+
+
 Route::resource('repayments', RepaymentController::class);
 Route::get('/reports/daily', [RepaymentController::class, 'dailyReport'])->name('reports.daily');
 Route::get('/reports/branch', [RepaymentController::class, 'branchReport'])->name('reports.branch');

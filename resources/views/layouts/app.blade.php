@@ -124,6 +124,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('users.create') }}">Create Manager</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" data-bs-toggle="dropdown">
+                            <i class="fa fa-bell"></i>
+                            <span class="badge bg-danger">{{ auth()->user()->unreadNotifications->count() }}</span>
+                        </a>
+
+
+                        <ul class="dropdown-menu">
+                            @forelse($notifications as $noti)
+                            <li>
+                                <a href="{{ route('loan-requests.show', $noti->data['loan_id']) }}">
+                                    Loan Request #{{ $noti->data['loan_id'] }}
+                                    (Member: {{ $noti->data['member_id'] }})
+                                </a>
+                            </li>
+                            @empty
+                            <li>No notifications</li>
+                            @endforelse
+                        </ul>
+
+                    </li>
+
                     @elseif(Auth::user()->role === 'manager')
                     <!-- <li class="nav-item">
                         <a class="nav-link" href="{{ route('users.create') }}">Create User</a>

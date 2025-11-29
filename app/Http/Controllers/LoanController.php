@@ -203,7 +203,7 @@ class LoanController extends Controller
 
         $loan->update($data);
 
-        return redirect()->route('loans.index')->with('success', 'Loan updated successfully!');
+        return back()->with('success', 'Loan updated successfully!');
     }
 
     /**
@@ -212,7 +212,7 @@ class LoanController extends Controller
     public function destroy(Loan $loan)
     {
         $loan->delete();
-        return redirect()->route('loans.index')->with('success', 'Loan deleted successfully!');
+        return back()->with('success', 'Loan deleted successfully!');
     }
 
     // PDF Export
@@ -268,7 +268,7 @@ class LoanController extends Controller
             return back()->with('error', 'This loan request is already approved.');
         }
 
-        // create actual loan
+        // Create the actual Loan
         $loan = Loan::create([
             'member_id' => $loanRequest->member_id,
             'branch_id' => $loanRequest->branch_id,
@@ -281,27 +281,29 @@ class LoanController extends Controller
             'principal' => $loanRequest->principal,
             'interest_rate' => $loanRequest->interest_rate,
             'tenure_months' => $loanRequest->tenure_months,
-            'disbursed_at' => $loanRequest->disbursed_at,
+            'disbursed_at' => $loanRequest->disbursed_at ?? now()->toDateString(),
             'status' => 'active',
             'is_approved' => 'approved',
+            'processing_fee' => $loanRequest->processing_fee ?? 0,
         ]);
 
-        // generate schedule
-        $this->scheduleService->generate($loan);
+        // ✅ Generate Repayments & Invoice
+        $loan->generateRepaymentsAndInvoice();
 
-        // update loan request status
+        // Update LoanRequest status
         $loanRequest->is_approved = 'approved';
         $loanRequest->save();
 
+        // Audit log
         AuditLog::create([
             'user_id' => Auth::id(),
-            'action' => 'loan.created',
+            'action' => 'loan.approved',
             'meta' => json_encode($loan),
         ]);
 
         return redirect()
             ->route('loan-requests.show', $loanRequest->id)
-            ->with('success', 'Loan approved and created successfully!');
+            ->with('success', 'Loan approved and created successfully with repayment schedule and invoice.');
     }
 
 

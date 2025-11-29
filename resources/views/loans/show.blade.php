@@ -129,7 +129,11 @@
     <p><strong class="text-primary">Principal:</strong> {{ number_format($loan->principal,2) }}</p>
     <p><strong class="text-primary">Interest Rate:</strong> {{ $loan->interest_rate }}%</p>
     <p><strong class="text-primary">Tenure:</strong> {{ $loan->tenure_months }} months</p>
-    <p><strong class="text-primary">EMI:</strong> {{ number_format($loan->monthly_emi,2) }}</p>
+    @if($loan->repayment_frequency === 'weekly')
+    <p><strong class="text-primary">EMI:</strong> ₹{{ number_format($loan->weekly_emi, 2) }}</p>
+    @else
+    <p><strong class="text-primary">EMI:</strong> ₹{{ number_format($loan->monthly_emi, 2) }}</p>
+    @endif
     <p><strong class="text-primary">Disbursed At:</strong> {{ $loan->disbursed_at }}</p>
     <p><strong class="text-primary">Status:</strong> {{ ucfirst($loan->status) }}</p>
 
@@ -154,7 +158,7 @@
             @endforeach
         </tbody>
     </table> --}} -->
-
+    @if($loan->invoice)
     <a href="{{ route('invoice.pdf', $loan->invoice->id) }}" class="btn btn-danger">
         Download PDF
     </a>
@@ -162,6 +166,7 @@
     <a href="{{ route('invoice.excel', $loan->invoice->id) }}" class="btn btn-success">
         Download Excel
     </a>
+    @endif
     <!-- <div style="text-align:left; margin-bottom:20px; border-radius:100%">
         <img src="{{ asset('images/finvels.jpeg') }}" alt="Company Logo" style="height:80px;">
     </div> -->

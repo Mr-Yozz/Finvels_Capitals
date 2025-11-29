@@ -72,7 +72,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label text-primary">Tenure (Months)</label>
+            <label class="form-label text-primary">Tenure</label>
             <input type="number" name="tenure_months" class="form-control" value="{{ old('tenure_months') }}" required>
             @error('tenure_months') <small class="text-danger">{{ $message }}</small> @enderror
         </div>

@@ -85,6 +85,8 @@
         </a>
     </div>
 
+    
+
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
@@ -95,8 +97,8 @@
                         <th>Mobile</th>
                         <th>Aadhaar</th>
                         <th>PAN</th>
-                        <th>Group</th>
-                        <th>Branch</th>
+                        <!-- <th>Group</th> -->
+                        <!-- <th>Branch</th> -->
                         <th>Bank Name</th>
                         <th>Account No</th>
                         <th>IFSC Code</th>
@@ -112,8 +114,8 @@
                         <td>{{ $member->mobile }}</td>
                         <td>{{ $member->aadhaar_encrypted }}</td>
                         <td>{{ $member->pan_encrypted }}</td>
-                        <td>{{ $member->group->name ?? '-' }}</td>
-                        <td>{{ $member->group->branch->name ?? '-' }}</td>
+                        <!-- <td>{{ $member->group->name ?? '-' }}</td> -->
+                        <!-- <td>{{ $member->group->branch->name ?? '-' }}</td> -->
                         <td>{{ $member->bank_name ?? '-' }}</td>
                         <td>{{ $member->account_number ?? '-' }}</td>
                         <td>{{ $member->ifsc_code ?? '-' }}</td>

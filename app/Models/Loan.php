@@ -8,14 +8,14 @@ use Carbon\Carbon;
 
 class Loan extends Model
 {
-    //
     protected $fillable = [
         'member_id',
         'branch_id',
         'principal',
         'interest_rate',
-        'tenure_months',
+        'tenure_months', // Stores total periods (weeks or months)
         'monthly_emi',
+        'weekly_emi',
         'disbursed_at',
         'status',
         'repayment_frequency',
@@ -25,13 +25,13 @@ class Loan extends Model
         'purpose',
         'spousename',
         'moratorium',
-        'loan_request_id',
     ];
 
     protected $casts = [
         'disbursed_at' => 'date',
     ];
 
+    // --- Relationships ---
     public function member()
     {
         return $this->belongsTo(Member::class);
@@ -55,97 +55,18 @@ class Loan extends Model
         return $this->belongsTo(LoanRequest::class, 'loan_request_id');
     }
 
+    // --- Booting and Scopes ---
+    // public static function booted()
+    // {
+    //     static::created(function ($loan) {
+    //         $loan->generateRepaymentsAndInvoice();
 
-    public static function booted()
-    {
-        static::created(function ($loan) {
-            // generate repayment schedule when created
-            $loan->generateRepaymentSchedule();
-
-            $loan->generateInvoice();
-
-            \App\Models\AuditLog::log(Auth::id() ?? 0, 'loan.created', $loan->toArray());
-        });
-        static::updated(function ($loan) {
-            \App\Models\AuditLog::log(Auth::id() ?? 0, 'loan.updated', $loan->getChanges());
-        });
-    }
-
-    // generate equal monthly installments (EMI) schedule
-    public function generateRepaymentSchedule()
-    {
-        // Remove any existing schedule for a clean re-generation
-        $this->repayments()->delete();
-
-        $P = floatval($this->principal);
-        $annualRate = floatval($this->interest_rate);
-        $freq = $this->repayment_frequency ?? 'monthly';
-        $total_periods = max(1, intval($this->tenure_months)); // number of installments
-
-        // Select period rate
-        $period_rate = ($freq === 'weekly') ? ($annualRate / 100) / 52 : ($annualRate / 100) / 12;
-
-        // calculate installment using standard annuity formula for reducing balance
-        if ($period_rate == 0) {
-            $installment = round($P / $total_periods, 2);
-        } else {
-            $r = $period_rate;
-            $n = $total_periods;
-            $installment = round($P * ($r * pow(1 + $r, $n)) / (pow(1 + $r, $n) - 1), 2);
-        }
-
-        // Save the computed installment into monthly_emi for compatibility (field name kept)
-        $this->monthly_emi = $installment;
-        $this->saveQuietly();
-
-        $start = $this->disbursed_at ? Carbon::parse($this->disbursed_at) : Carbon::now();
-        $balance = $P;
-
-        for ($i = 1; $i <= $total_periods; $i++) {
-            // interest on current balance
-            $interest = round($balance * $period_rate, 2);
-            $principal = round($installment - $interest, 2);
-
-            // if last payment, adjust to zero out remaining rounding differences
-            if ($i === $total_periods) {
-                $principal = round($balance, 2);
-                $installment = round($principal + $interest, 2);
-            }
-
-            $balance = round($balance - $principal, 2);
-            if ($balance < 0) $balance = 0.00;
-
-            // compute due date increment: weeks or months
-            if ($freq === 'weekly') {
-                $due = $start->copy()->addDays(8 * $i);  // 8 days cycle
-            } else {
-                $due = $start->copy()->addMonths($i);
-            }
-
-            // Create repayment row
-            $this->repayments()->create([
-                'due_date' => $due->toDateString(),
-                'amount' => $installment,
-                'paid_amount' => 0,
-                'paid_at' => null,
-                'status' => 'due',
-                'principal_component' => $principal,
-                'interest_component' => $interest,
-                'balance' => $balance,
-                'loan_instance' => "INST-{$i}",
-                'due_total' => $installment,
-                'pr' => 0,
-                'sanchay_due' => 0,
-                'lp_pal' => null,
-                'due_instance' => null,
-                'member_adv' => 0,
-                'due_disb' => 0,
-                'spouse_kyc' => null,
-            ]);
-        }
-
-        return true;
-    }
+    //         \App\Models\AuditLog::log(Auth::id() ?? 0, 'loan.created', $loan->toArray());
+    //     });
+    //     static::updated(function ($loan) {
+    //         \App\Models\AuditLog::log(Auth::id() ?? 0, 'loan.updated', $loan->getChanges());
+    //     });
+    // }
 
     public function outstanding()
     {
@@ -165,72 +86,288 @@ class Loan extends Model
         return $query->whereHas('member.user', fn($q) => $q->where('id', $user->id));
     }
 
-    public function generateInvoice()
+    // --------------------------------------------------------------------------------
+    // --- AMORTIZATION CORE LOGIC ---
+    // --------------------------------------------------------------------------------
+
+    // public function buildSchedule($interestOnlyFirst = false)
+    // {
+    //     $schedule = [];
+
+    //     $P = floatval($this->principal);
+    //     $annualRate = floatval($this->interest_rate);
+    //     $N = max(1, intval($this->tenure_months)); // total periods
+    //     $disbursed = $this->disbursed_at ? Carbon::parse($this->disbursed_at) : Carbon::now();
+
+    //     // Determine rate and interval based on repayment frequency
+    //     if ($this->repayment_frequency === 'monthly') {
+    //         $R = ($annualRate / 100) / 12;
+    //         $intervalDays = 30;
+    //         $instancePrefix = 'MONTH';
+    //     } else { // weekly
+    //         $R = ($annualRate / 100) / 52;
+    //         $intervalDays = 8;
+    //         $instancePrefix = 'WEEK';
+    //     }
+
+    //     // Standard EMI formula
+    //     $EMI = 0;
+    //     if ($R > 0) {
+    //         $EMI = round($P * $R * pow(1 + $R, $N) / (pow(1 + $R, $N) - 1), 2);
+    //     } else {
+    //         $EMI = round($P / $N, 2);
+    //     }
+
+    //     $remaining = $P;
+    //     $currentDate = $disbursed->copy();
+
+    //     for ($i = 1; $i <= $N; $i++) {
+    //         $currentDate = $currentDate->copy()->addDays($intervalDays);
+
+    //         if ($i == 1 && $interestOnlyFirst) {
+    //             // First installment interest-only
+    //             $interest = round($remaining * $R, 2);
+    //             $principalPay = 0.00;
+    //             $totalPayment = $interest;
+    //         } else {
+    //             $interest = round($remaining * $R, 2);
+    //             $principalPay = round($EMI - $interest, 2);
+
+    //             // Adjust last installment
+    //             if ($i == $N) {
+    //                 $principalPay = round($remaining, 2);
+    //                 $totalPayment = round($principalPay + $interest, 2);
+    //             } else {
+    //                 $totalPayment = $EMI;
+    //             }
+    //         }
+
+    //         $remaining = round($remaining - $principalPay, 2);
+    //         if ($remaining < 0) $remaining = 0;
+
+    //         $schedule[] = [
+    //             'inst_no' => $i,
+    //             'date' => $currentDate->format('Y-m-d'),
+    //             'principal' => $principalPay,
+    //             'interest' => $interest,
+    //             'total' => $totalPayment,
+    //             'prin_os' => $remaining,
+    //             'loan_instance' => $instancePrefix . "-$i",
+    //         ];
+
+    //         if ($remaining <= 0) break;
+    //     }
+
+    //     // Save EMI in loan
+    //     if ($this->repayment_frequency === 'monthly') {
+    //         $this->monthly_emi = $EMI;
+    //     } else {
+    //         $this->weekly_emi = $EMI;
+    //     }
+    //     $this->saveQuietly();
+
+    //     return $schedule;
+    // }
+    public function buildSchedule($firstInterestOnly = true)
     {
-        if ($this->invoice()->exists()) {
-            return $this->invoice;
+        $schedule = [];
+
+
+        $P = floatval($this->principal);
+        $annualRate = floatval($this->interest_rate);
+        $N = max(1, intval($this->tenure_months)); // total periods
+        $moratorium = intval($this->moratorium ?? 0);
+
+        $disbursed = $this->disbursed_at
+            ? \Carbon\Carbon::parse($this->disbursed_at)
+            : \Carbon\Carbon::now();
+
+        if ($this->repayment_frequency === 'monthly') {
+            $R = ($annualRate / 100) / 12; // monthly rate
+            $prefix = 'MONTH';
+            $nextDate = $disbursed->copy()->addMonth();
+            $interval = 'month';
+        } else { // weekly
+            $R = ($annualRate / 100) / 52; // weekly rate
+            $prefix = 'WEEK';
+            $nextDate = $disbursed->copy()->addDays(8); // weekly + 1 day
+            $interval = 'week';
         }
 
-        // Create Invoice Header
-        $invoice = \App\Models\Invoice::create([
-            'loan_id'        => $this->id,
-            'invoice_no'     => 'INV-' . now()->format('Ymd') . '-' . $this->id,
-            'invoice_date'   => now(),
-            'loan_amount'    => $this->principal,
-            'processing_fee' => $this->processing_fee ?? 0,
-            'insurance_amount' => $this->insurance_amount ?? 0,
-            'total_amount'   => $this->principal
-                + ($this->processing_fee ?? 0)
-                + ($this->insurance_amount ?? 0),
-            'notes'          => null,
-        ]);
+        $balance = $P;
+        $firstPayment = true;
 
-        // EMI CALCULATION (Reducing balance)
-        $P  = $this->principal;
-        $r  = $this->interest_rate / 100;  // monthly rate
-        $n  = $this->tenure_months;
+        for ($i = 1; $i <= $N; $i++) {
 
-        // EMI using standard formula
-        $emi = round(
-            $P * ($r * pow(1 + $r, $n)) / (pow(1 + $r, $n) - 1),
-            2
-        );
+            $interestOnly = ($firstPayment && $firstInterestOnly) || ($i <= $moratorium);
 
-        $opening = $P;
-
-        foreach ($this->repayments as $i => $rpay) {
-
-            // Calculate interest for the month
-            $interest = round($opening * $r, 2);
-
-            // Principal = EMI – Interest
-            $principal = round($emi - $interest, 2);
-
-            // For last installment adjust rounding
-            if ($i + 1 == $n) {
-                $principal = $opening;
-                $emi = round($principal + $interest, 2);
+            if ($interestOnly) {
+                $interest = round($balance * $R, 2);
+                $principal = 0;
+                $EMI = $interest;
+            } else {
+                // Remaining periods after interest-only/moratorium
+                $remainingPeriods = $N - max($moratorium, $firstInterestOnly ? 1 : 0) - ($i - max($moratorium, $firstInterestOnly ? 1 : 0) - 1);
+                $EMI = round($balance * $R * pow(1 + $R, $remainingPeriods) / (pow(1 + $R, $remainingPeriods) - 1), 2);
+                $interest = round($balance * $R, 2);
+                $principal = round($EMI - $interest, 2);
+                $principal = max(0, $principal); // ensure positive
             }
 
-            // Closing balance
-            $closing = round($opening - $principal, 2);
+            // Last installment adjustment
+            if ($i == $N) {
+                $principal = $balance;
+                $EMI = $principal + $interest;
+            }
 
-            // Create invoice line
+            $balance = round($balance - $principal, 2);
+            if ($balance < 0) $balance = 0;
+
+            $schedule[] = [
+                'inst_no' => $i,
+                'date' => $nextDate->format('Y-m-d'),
+                'principal' => $principal,
+                'interest' => $interest,
+                'total' => $EMI,
+                'prin_os' => $balance,
+                'loan_instance' => $prefix . "-$i",
+            ];
+
+            $firstPayment = false;
+            $nextDate = $nextDate->copy()->add($interval, 1); // month/week
+            if ($interval === 'week') {
+                $nextDate->addDay(); // weekly +1 day
+            }
+        }
+
+        // Save EMI for display
+        if ($this->repayment_frequency === 'monthly') {
+            $this->monthly_emi = $EMI;
+        } else {
+            $this->weekly_emi = $EMI;
+        }
+        $this->saveQuietly();
+
+        return $schedule;
+    }
+
+
+    /**
+     * Generate repayments from a schedule
+     */
+    public function generateRepaymentsFromSchedule(array $schedule)
+    {
+        $this->repayments()->delete(); // clear old
+
+        foreach ($schedule as $row) {
+            \App\Models\Repayment::create([
+                'loan_id' => $this->id,
+                'loan_instance' => $row['loan_instance'],
+                'due_date' => $row['date'],
+                'principal_component' => $row['principal'],
+                'interest_component' => $row['interest'],
+                'amount' => $row['total'],
+                'balance' => $row['prin_os'],
+                'status' => 'due',
+                'due_total' => $row['total'],
+            ]);
+        }
+    }
+
+    /**
+     * Generate Invoice from a schedule
+     */
+    public function generateInvoiceFromSchedule(array $schedule)
+    {
+        $this->invoice()->delete(); // clear existing
+
+        $totalPrincipal = array_sum(array_column($schedule, 'principal'));
+        $totalInterest  = array_sum(array_column($schedule, 'interest'));
+
+        $invoice = \App\Models\Invoice::create([
+            'loan_id' => $this->id,
+            'invoice_no' => 'INV-' . now()->format('Ymd') . '-' . $this->id,
+            'invoice_date' => now()->toDateString(),
+            'loan_amount' => $this->principal,
+            'processing_fee' => $this->processing_fee ?? 0,
+            'insurance_amount' => $this->insurance_amount ?? 0,
+            'principal_total' => $totalPrincipal,
+            'interest_total' => $totalInterest,
+            'total_amount' => $totalPrincipal + $totalInterest + ($this->processing_fee ?? 0) + ($this->insurance_amount ?? 0),
+            'notes' => 'Loan disbursement invoice',
+        ]);
+
+        foreach ($schedule as $row) {
             \App\Models\InvoiceLine::create([
                 'invoice_id' => $invoice->id,
-                'inst_no'    => 'INST-' . ($i + 1),
-                'due_date'   => $rpay->due_date,
-                'principal'  => $principal,
-                'interest'   => $interest,
-                'total'      => $emi,
-                'prin_os'    => $closing, // outstanding
+                'inst_no' => $row['inst_no'],
+                'due_date' => $row['date'],
+                'principal' => $row['principal'],
+                'interest' => $row['interest'],
+                'total' => $row['total'],
+                'prin_os' => $row['prin_os'],
                 'km_signature' => null,
             ]);
-
-            // move to next month
-            $opening = $closing;
         }
 
         return $invoice;
+    }
+
+    /**
+     * Wrapper: generate both repayments & invoice consistently
+     */
+    public function generateRepaymentsAndInvoice()
+    {
+        $this->repayments()->delete();
+        $this->invoice()->delete();
+
+        $schedule = $this->buildSchedule(true);
+
+        $totalPrincipal = 0;
+        $totalInterest = 0;
+
+        // Repayments
+        foreach ($schedule as $row) {
+            $this->repayments()->create([
+                'loan_instance' => $row['loan_instance'],
+                'due_date' => $row['date'],
+                'principal_component' => $row['principal'],
+                'interest_component' => $row['interest'],
+                'amount' => $row['total'],
+                'balance' => $row['prin_os'],
+                'status' => 'due',
+                'due_total' => $row['total'],
+            ]);
+
+            $totalPrincipal += $row['principal'];
+            $totalInterest += $row['interest'];
+        }
+
+        // Invoice
+        $invoice = $this->invoice()->create([
+            'invoice_no' => 'INV-' . now()->format('Ymd') . '-' . $this->id,
+            'invoice_date' => now()->toDateString(),
+            'loan_amount' => $this->principal,
+            'processing_fee' => $this->processing_fee ?? 0,
+            'insurance_amount' => $this->insurance_amount ?? 0,
+            'principal_total' => $totalPrincipal,
+            'interest_total' => $totalInterest,
+            'total_amount' => $totalPrincipal + $totalInterest + ($this->processing_fee ?? 0) + ($this->insurance_amount ?? 0),
+            'notes' => 'Loan Disbursement Invoice',
+        ]);
+
+        foreach ($schedule as $row) {
+            $invoice->lines()->create([
+                'inst_no' => $row['inst_no'],
+                'due_date' => $row['date'],
+                'principal' => $row['principal'],
+                'interest' => $row['interest'],
+                'total' => $row['total'],
+                'prin_os' => $row['prin_os'],
+                'km_signature' => null,
+            ]);
+        }
+
+        return true;
     }
 }

@@ -110,7 +110,12 @@
                         <td>₹{{ number_format($loan->principal, 2) }}</td>
                         <td>{{ $loan->interest_rate }}%</td>
                         <td>{{ $loan->tenure_months }}</td>
+                        @if($loan->repayment_frequency === 'weekly')
+                        <td>₹{{ number_format($loan->weekly_emi, 2) }}</td>
+                        @else
                         <td>₹{{ number_format($loan->monthly_emi, 2) }}</td>
+                        @endif
+
                         <td>
                             @if($loan->status == 'approved')
                             <span class="badge bg-success">Approved</span>

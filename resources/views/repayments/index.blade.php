@@ -175,9 +175,9 @@
                     <td>₹{{ number_format($repayment->amount, 2) }}</td>
 
                     {{-- new breakdown columns --}}
-                    <td>₹{{ number_format($repayment->principal_part ?? 0, 2) }}</td>
-                    <td>₹{{ number_format($repayment->interest_part ?? 0, 2) }}</td>
-                    <td>₹{{ number_format($repayment->remaining_balance ?? 0, 2) }}</td>
+                    <td>₹{{ number_format($repayment->principal_component  ?? 0, 2) }}</td>
+                    <td>₹{{ number_format($repayment->interest_component  ?? 0, 2) }}</td>
+                    <td>₹{{ number_format($repayment->balance  ?? 0, 2) }}</td>
 
                     <td>₹{{ number_format($repayment->paid_amount, 2) }}</td>
 

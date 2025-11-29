@@ -226,7 +226,20 @@ class RepaymentController extends Controller
         ]);
 
         $repayment->update($validated);
-        return redirect()->route('repayments.index')->with('success', 'Repayment updated successfully!');
+
+        // ---- AUTO CLOSE LOGIC ----
+        $loan = \App\Models\Loan::find($validated['loan_id']);
+
+        $totalDueCount = $loan->repayments()->where('status', '!=', 'paid')->count();
+
+        if ($totalDueCount == 0) {
+            $loan->status = 'closed';
+            $loan->save();
+        }
+
+        return redirect()
+            ->route('repayments.index', ['loan_id' => $validated['loan_id']])
+            ->with('success', 'Repayment updated successfully!');
     }
 
     /**

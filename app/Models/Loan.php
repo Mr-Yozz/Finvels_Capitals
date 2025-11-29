@@ -110,7 +110,7 @@ class Loan extends Model
 
             // compute due date increment: weeks or months
             if ($freq === 'weekly') {
-                $due = $start->copy()->addWeeks($i);
+                $due = $start->copy()->addDays(8 * $i);  // 8 days cycle
             } else {
                 $due = $start->copy()->addMonths($i);
             }
@@ -158,20 +158,75 @@ class Loan extends Model
         return $query->whereHas('member.user', fn($q) => $q->where('id', $user->id));
     }
 
+    // public function generateInvoice()
+    // {
+
+    //     if ($this->invoice()->exists()) {
+    //         return $this->invoice;
+    //     }
+
+    //     // Generate invoice number
+    //     $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . $this->id;
+
+    //     // Create invoice header
+    //     $invoice = \App\Models\Invoice::create([
+    //         'loan_id'        => $this->id,
+    //         'invoice_no'     => $invoiceNo,
+    //         'invoice_date'   => now(),
+    //         'loan_amount'    => $this->principal,
+    //         'processing_fee' => $this->processing_fee ?? 3,
+    //         'insurance_amount' => $this->insurance_amount ?? 0,
+    //         'total_amount'   => $this->principal
+    //             + ($this->processing_fee ?? 0)
+    //             + ($this->insurance_amount ?? 0),
+    //         'notes'          => null,
+    //     ]);
+
+    //     // Pre-calc once
+    //     $principal = $this->principal;
+    //     $interestRate = $this->interest_rate;
+    //     $dues = $this->tenure_months;
+
+    //     $interestAmount = $principal * ($interestRate / 100);
+    //     $totalPayable   = $principal + $interestAmount;
+
+    //     $monthlyPrincipal = $principal / $dues;
+    //     $monthlyInterest  = $interestAmount / $dues;
+    //     $monthlyTotal     = $monthlyPrincipal + $monthlyInterest;
+
+
+    //     foreach ($this->repayments as $i => $repay) {
+
+    //         $os = max($principal - ($monthlyPrincipal * $i), 0);
+
+    //         \App\Models\InvoiceLine::create([
+    //             'invoice_id' => $invoice->id,
+    //             'inst_no'    => "INST-" . ($i + 1),
+    //             'due_date'   => $repay->due_date,
+
+    //             'principal'  => round($monthlyPrincipal, 2),
+    //             'interest'   => round($monthlyInterest, 2),
+    //             'total'      => round($monthlyTotal, 2),
+
+    //             'prin_os'    => round($os, 2),
+    //             'km_signature' => null,
+    //         ]);
+    //     }
+
+
+    //     return $invoice;
+    // }
+
     public function generateInvoice()
     {
-
         if ($this->invoice()->exists()) {
             return $this->invoice;
         }
 
-        // Generate invoice number
-        $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . $this->id;
-
-        // Create invoice header
+        // Create Invoice Header
         $invoice = \App\Models\Invoice::create([
             'loan_id'        => $this->id,
-            'invoice_no'     => $invoiceNo,
+            'invoice_no'     => 'INV-' . now()->format('Ymd') . '-' . $this->id,
             'invoice_date'   => now(),
             'loan_amount'    => $this->principal,
             'processing_fee' => $this->processing_fee ?? 0,
@@ -182,18 +237,50 @@ class Loan extends Model
             'notes'          => null,
         ]);
 
-        // Create invoice lines from repayments
-        foreach ($this->repayments as $i => $repay) {
+        // EMI CALCULATION (Reducing balance)
+        $P  = $this->principal;
+        $r  = $this->interest_rate / 100;  // monthly rate
+        $n  = $this->tenure_months;
+
+        // EMI using standard formula
+        $emi = round(
+            $P * ($r * pow(1 + $r, $n)) / (pow(1 + $r, $n) - 1),
+            2
+        );
+
+        $opening = $P;
+
+        foreach ($this->repayments as $i => $rpay) {
+
+            // Calculate interest for the month
+            $interest = round($opening * $r, 2);
+
+            // Principal = EMI – Interest
+            $principal = round($emi - $interest, 2);
+
+            // For last installment adjust rounding
+            if ($i + 1 == $n) {
+                $principal = $opening;
+                $emi = round($principal + $interest, 2);
+            }
+
+            // Closing balance
+            $closing = round($opening - $principal, 2);
+
+            // Create invoice line
             \App\Models\InvoiceLine::create([
-                'invoice_id'   => $invoice->id,
-                'inst_no'      => "INST-" . ($i + 1),
-                'due_date'     => $repay->due_date,
-                'principal'    => $repay->principal_component ?? 0,
-                'interest'     => $repay->interest_component ?? 0,
-                'total'        => $repay->amount,
-                'prin_os'      => $repay->balance ?? 0,
+                'invoice_id' => $invoice->id,
+                'inst_no'    => 'INST-' . ($i + 1),
+                'due_date'   => $rpay->due_date,
+                'principal'  => $principal,
+                'interest'   => $interest,
+                'total'      => $emi,
+                'prin_os'    => $closing, // outstanding
                 'km_signature' => null,
             ]);
+
+            // move to next month
+            $opening = $closing;
         }
 
         return $invoice;

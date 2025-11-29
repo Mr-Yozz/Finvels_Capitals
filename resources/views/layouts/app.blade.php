@@ -122,7 +122,7 @@
 
                     @if(Auth::user()->role === 'admin')
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('users.create') }}">Create Manager</a>
+                        <a class="nav-link" href="{{ route('users.index') }}">Create Manager</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link" data-bs-toggle="dropdown">
@@ -131,17 +131,31 @@
                         </a>
 
 
+                        <!--<ul class="dropdown-menu">-->
+                        <!--    {{--@forelse($notifications as $noti)--}}-->
+                        <!--    <li>-->
+                        <!--        <a href="{{-- route('loan-requests.show', $noti->data['loan_id']) --}}">-->
+                        <!--            Loan Request #{{-- $noti->data['loan_id'] --}}-->
+                        <!--            (Member: {{-- $noti->data['member_id'] --}})-->
+                        <!--        </a>-->
+                        <!--    </li>-->
+                        <!--   {{-- @empty --}}-->
+                        <!--    <li>No notifications</li>-->
+                        <!--    {{--@endforelse--}}-->
+                        <!--</ul>-->
                         <ul class="dropdown-menu">
-                            @forelse($notifications as $noti)
+                            @if(Auth::check())
+                            @foreach(Auth::user()->unreadNotifications as $noti)
                             <li>
                                 <a href="{{ route('loan-requests.show', $noti->data['loan_id']) }}">
                                     Loan Request #{{ $noti->data['loan_id'] }}
                                     (Member: {{ $noti->data['member_id'] }})
                                 </a>
                             </li>
-                            @empty
+                            @endforeach
+                            @else
                             <li>No notifications</li>
-                            @endforelse
+                            @endif
                         </ul>
 
                     </li>

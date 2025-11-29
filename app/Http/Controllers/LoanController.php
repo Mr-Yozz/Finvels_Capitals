@@ -64,14 +64,14 @@ class LoanController extends Controller
             'repayment_frequency' => 'required',
             'insurance_amount' => 'required|numeric',
             'principal' => 'required|numeric|min:1',
-            'interest_rate' => 'required|numeric|min:0',
-            'tenure_months' => 'required|integer|min:1',
+            'interest_rate' => 'required|numeric',
+            'tenure_months' => 'required|integer',
             'disbursed_at' => 'nullable|date',
             'status' => 'required|in:pending,active,closed',
 
         ]);
 
-        $data['processing_fee'] = $data['processing_fee'] ?? 0;
+        $data['processing_fee'] = $data['processing_fee'] ?? 3;
         $data['created_by'] = Auth::id();
         $data['is_approved'] = 'pending';
 
@@ -189,15 +189,15 @@ class LoanController extends Controller
     {
         $notifications = [];
 
-        if (Auth::check()) {
-            $notifications = DatabaseNotification::where('notifiable_id', Auth::id())
-                ->where('notifiable_type', get_class(Auth::user()))
-                ->whereNull('read_at')
-                ->latest()
-                ->get();
-        }
+        // if (Auth::check()) {
+        //     $notifications = DatabaseNotification::where('notifiable_id', Auth::id())
+        //         ->where('notifiable_type', get_class(Auth::user()))
+        //         ->whereNull('read_at')
+        //         ->latest()
+        //         ->get();
+        // }
         $loanRequest = LoanRequest::findOrFail($id);
-        return view('admin.loan_request.view', compact('loanRequest', 'notifications'));
+        return view('admin.loan_request.view', compact('loanRequest'));
     }
 
     public function approve($id)

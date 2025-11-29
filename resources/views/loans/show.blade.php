@@ -162,7 +162,14 @@
     <a href="{{ route('invoice.excel', $loan->invoice->id) }}" class="btn btn-success">
         Download Excel
     </a>
-
+    <!-- <div style="text-align:left; margin-bottom:20px; border-radius:100%">
+        <img src="{{ asset('images/finvels.jpeg') }}" alt="Company Logo" style="height:80px;">
+    </div> -->
+    <div style="text-align:left; margin-bottom:20px;">
+        <img src="{{ asset('images/finvels.jpeg') }}"
+            alt="Company Logo"
+            style="height:80px; width:80px; border-radius:50%; object-fit:cover;">
+    </div>
     <!-- Borrower / Loan core details -->
     <div class="detail-grid">
         <div>
@@ -238,7 +245,6 @@
             <div class="value">{{ $loan->member->mobile ?? '-' }}</div>
         </div>
     </div>
-
 
     <!-- Amortization schedule -->
     <div class="tables-wrap">

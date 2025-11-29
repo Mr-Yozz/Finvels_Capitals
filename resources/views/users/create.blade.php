@@ -29,16 +29,19 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <input type="text" name="number"
+                class="form-control @error('number') is-invalid @enderror">
+            @error('number')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+
+        <div class="mb-3">
             <label class="form-label">Role</label>
             <select name="role" class="form-select @error('role') is-invalid @enderror" required>
-                <option value="">-- Select Role --</option>
-
-                @if(Auth::user()->role === 'admin')
-                <option value="manager">Manager</option>
-                <!-- <option value="user">User</option> -->
-                <!-- {{--@elseif(Auth::user()->role === 'manager')--}} -->
-                <!-- <option value="user">User</option> -->
-                @endif
+                <option value="manager" selected>Manager</option>
             </select>
             @error('role') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

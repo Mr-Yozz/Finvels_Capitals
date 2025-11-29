@@ -27,6 +27,7 @@ class UserManagementController extends Controller
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:6',
             'role'     => 'required|in:admin,manager,user',
+            'number' => 'nullable|regex:/^\+?[0-9]{10,15}$/',
         ]);
 
         $creatorRole = Auth::user()->role;
@@ -52,8 +53,64 @@ class UserManagementController extends Controller
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => $request->role,
+            'number'   => $request->number,
         ]);
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
+    }
+
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+
+        return view('users.edit', compact('user'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'role'  => 'required|in:admin,manager,user',
+            'number' => 'nullable|regex:/^\+?[0-9]{10,15}$/'
+        ]);
+
+        $creatorRole = Auth::user()->role;
+
+        if ($creatorRole === 'admin') {
+            if (!in_array($request->role, ['manager', 'user'])) {
+                abort(403, 'Admin can only assign Manager or User');
+            }
+        } elseif ($creatorRole === 'manager') {
+            if ($request->role !== 'user') {
+                abort(403, 'Manager can only assign User');
+            }
+        } else {
+            abort(403, 'User cannot update accounts');
+        }
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'number' => $request->number,
+        ]);
+
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->id == Auth::id()) {
+            abort(403, 'You cannot delete yourself.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'User deleted successfully.');
     }
 }

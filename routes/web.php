@@ -172,7 +172,8 @@ Route::get('/invoice/{id}/pdf', [LoanController::class, 'exportPdf_in'])->name('
 Route::get('/invoice/{id}/excel', [LoanController::class, 'exportExcel_in'])->name('invoice.excel');
 
 Route::get('/collection-sheet/{groupId}', [CollectionSheetController::class, 'index'])->name('collection.sheet');
-Route::get('/collection-sheet/{groupId}/pdf', [CollectionSheetController::class, 'exportPdf'])->name('collection.sheet.pdf');
+Route::get('collection-sheet/{groupId}/export-pdf', [CollectionSheetController::class, 'exportPdf'])->name('collection.export.pdf');
+Route::get('collection-sheet/{groupId}/export-excel', [CollectionSheetController::class, 'exportExcel'])->name('collection.export.excel');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

@@ -85,7 +85,7 @@
         <!-- PROCESSING FEE -->
         <div class="mb-3">
             <label class="form-label text-primary">
-                Processing Fee (1.5% + GST Auto)
+                Processing Fee (3% + GST Auto)
             </label>
             <input type="number" id="processing_fee" name="processing_fee" class="form-control" readonly>
         </div>

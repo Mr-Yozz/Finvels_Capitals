@@ -16,6 +16,7 @@ use App\Http\Controllers\AccountCategoryController;
 use App\Http\Controllers\AccountDashboardController;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CollectionSheetController;
 
 
@@ -83,9 +84,9 @@ Route::prefix('group')->controller(GroupController::class)->group(function () {
 });
 
 
-Route::post('/member/send-otp', [MemberController::class, 'sendOtp'])->name('members.sendOtp');
-Route::post('/member/verify-otp', [MemberController::class, 'verifyOtp'])->name('members.verifyOtp');
-Route::post('/members/resend-otp', [MemberController::class, 'resendOtp'])->name('members.resendOtp');
+// Route::post('/member/send-otp', [MemberController::class, 'sendOtp'])->name('members.sendOtp');
+// Route::post('/member/verify-otp', [MemberController::class, 'verifyOtp'])->name('members.verifyOtp');
+// Route::post('/members/resend-otp', [MemberController::class, 'resendOtp'])->name('members.resendOtp');
 
 
 Route::prefix('member')->name('members.')->controller(MemberController::class)->group(function () {
@@ -116,7 +117,7 @@ Route::prefix('loan')->name('loans.')->controller(LoanController::class)->group(
     Route::get('loans/export/pdf', [LoanController::class, 'exportPdf'])->name('export.pdf');
 });
 Route::get('loan-requests/{id}', [LoanController::class, 'show_loan'])
-        ->name('loan-requests.show');
+    ->name('loan-requests.show');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('loan-requests/{id}', [LoanController::class, 'show_admin'])->name('loan-requests.show');
@@ -184,6 +185,17 @@ Route::get('/loans/group/{group}', [LoanController::class, 'members'])->name('lo
 
 // Show loans of member
 Route::get('/loans/member/{member}', [LoanController::class, 'memberLoans'])->name('loans.memberLoans');
+
+
+Route::get('/reports', [BillingController::class, 'groups'])->name('reports.groups');
+Route::get('/reports/group/{group}', [BillingController::class, 'members'])->name('reports.members');
+Route::get('/reports/member/{member}', [BillingController::class, 'memberBillings'])->name('reports.dailyReport');
+Route::post('/repayment/{id}/pay', [BillingController::class, 'markPaid'])->name('repayment.pay');
+
+
+Route::get('/groups/{group}/billings', [BillingController::class, 'groupDailyBillings'])->name('group.billings');
+
+Route::post('/repayment/{repayment}/pay', [BillingController::class, 'RepaymentController@pay'])->name('repayment.pay');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

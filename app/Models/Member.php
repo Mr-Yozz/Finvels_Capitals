@@ -11,7 +11,7 @@ class Member extends Model
     //
     use EncryptsAttributes;
     use Notifiable;
-    protected $fillable = [ 'user_id','group_id', 'name', 'mobile', 'aadhaar_encrypted', 'pan_encrypted', 'bank_name', 'account_number', 'ifsc_code', 'branch_name', 'branch_address'];
+    protected $fillable = ['user_id', 'group_id', 'name', 'mobile', 'aadhaar_encrypted', 'pan_encrypted', 'bank_name', 'account_number', 'ifsc_code', 'branch_name', 'branch_address'];
     protected $encrypts = ['aadhaar_encrypted', 'pan_encrypted']; // trait reads this
 
     public function group()
@@ -22,6 +22,12 @@ class Member extends Model
     public function loans()
     {
         return $this->hasMany(Loan::class);
+    }
+
+    public function latestLoan()
+    {
+        // This is the efficient way to fetch only the ID of the latest loan
+        return $this->hasOne(Loan::class)->latestOfMany();
     }
 
     public function user()

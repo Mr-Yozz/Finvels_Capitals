@@ -25,6 +25,7 @@ class Loan extends Model
         'purpose',
         'spousename',
         'moratorium',
+        'paid_amount',
     ];
 
     protected $casts = [

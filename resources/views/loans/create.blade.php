@@ -9,14 +9,16 @@
 
         <div class="mb-3">
             <label class="form-label text-primary">Member</label>
-            <select name="member_id" class="form-select" required>
-                <option value="">-- Select Member --</option>
+            <select name="member_id" class="form-control" required>
+                <option value="">Select Member</option>
                 @foreach($members as $member)
-                <option value="{{ $member->id }}" {{ old('member_id') == $member->id ? 'selected' : '' }}>
-                    {{ $member->name }} ({{ $member->group->name ?? '-' }} - {{ $member->group->branch->name ?? '-' }})
+                <option value="{{ $member->id }}"
+                    {{ isset($selectedMemberId) && $selectedMemberId == $member->id ? 'selected' : '' }}>
+                    {{ $member->name }} ({{ $member->group->name }})
                 </option>
                 @endforeach
             </select>
+
             @error('member_id') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
@@ -24,8 +26,10 @@
             <label class="form-label text-primary">Branch</label>
             <select name="branch_id" class="form-select" required>
                 <option value="">-- Select Branch --</option>
+
                 @foreach($branches as $branch)
-                <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>
+                <option value="{{ $branch->id }}"
+                    {{ isset($autoBranch) && $autoBranch->id == $branch->id ? 'selected' : '' }}>
                     {{ $branch->name }}
                 </option>
                 @endforeach

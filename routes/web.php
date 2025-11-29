@@ -115,6 +115,8 @@ Route::prefix('loan')->name('loans.')->controller(LoanController::class)->group(
     Route::get('loans/export/excel', [LoanController::class, 'exportExcel'])->name('export.excel');
     Route::get('loans/export/pdf', [LoanController::class, 'exportPdf'])->name('export.pdf');
 });
+Route::get('loan-requests/{id}', [LoanController::class, 'show_loan'])
+        ->name('loan-requests.show');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('loan-requests/{id}', [LoanController::class, 'show_admin'])->name('loan-requests.show');

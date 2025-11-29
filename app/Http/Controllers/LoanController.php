@@ -65,12 +65,30 @@ class LoanController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $members = Member::with('group.branch')->get();
+        $selectedMemberId = $request->member_id;
+
+        // Get the member
+        $member = Member::with('group.branch')->find($selectedMemberId);
+        $autoBranch = $member?->group?->branch;
+
+        $members = Member::with('group')->get();
         $branches = Branch::all();
-        return view('loans.create', compact('members', 'branches'));
+
+        // dd([
+        //     'member_id' => $request->member_id,
+        //     'member' => Member::with('group.branch')->find($request->member_id)
+        // ]);
+
+        return view('loans.create', compact(
+            'members',
+            'branches',
+            'selectedMemberId',
+            'autoBranch'
+        ));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -128,7 +146,26 @@ class LoanController extends Controller
     public function show(Loan $loan)
     {
         $loan->load('member.group.branch', 'repayments');
+
         return view('loans.show', compact('loan'));
+    }
+
+    public function show_loan($id)
+    {
+        $loanRequest = LoanRequest::with([
+            'member.group.branch',
+            'invoice.lines'
+        ])->findOrFail($id);
+
+        // Load Loan if approved
+        $loan = null;
+        if ($loanRequest->is_approved === 'approved') {
+            $loan = Loan::with('repayments', 'member.group.branch')
+                ->where('loan_request_id', $loanRequest->id)
+                ->first();
+        }
+
+        return view('loans.show', compact('loanRequest', 'loan'));
     }
 
     /**

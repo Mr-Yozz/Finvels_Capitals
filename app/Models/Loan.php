@@ -165,65 +165,6 @@ class Loan extends Model
         return $query->whereHas('member.user', fn($q) => $q->where('id', $user->id));
     }
 
-    // public function generateInvoice()
-    // {
-
-    //     if ($this->invoice()->exists()) {
-    //         return $this->invoice;
-    //     }
-
-    //     // Generate invoice number
-    //     $invoiceNo = 'INV-' . now()->format('Ymd') . '-' . $this->id;
-
-    //     // Create invoice header
-    //     $invoice = \App\Models\Invoice::create([
-    //         'loan_id'        => $this->id,
-    //         'invoice_no'     => $invoiceNo,
-    //         'invoice_date'   => now(),
-    //         'loan_amount'    => $this->principal,
-    //         'processing_fee' => $this->processing_fee ?? 3,
-    //         'insurance_amount' => $this->insurance_amount ?? 0,
-    //         'total_amount'   => $this->principal
-    //             + ($this->processing_fee ?? 0)
-    //             + ($this->insurance_amount ?? 0),
-    //         'notes'          => null,
-    //     ]);
-
-    //     // Pre-calc once
-    //     $principal = $this->principal;
-    //     $interestRate = $this->interest_rate;
-    //     $dues = $this->tenure_months;
-
-    //     $interestAmount = $principal * ($interestRate / 100);
-    //     $totalPayable   = $principal + $interestAmount;
-
-    //     $monthlyPrincipal = $principal / $dues;
-    //     $monthlyInterest  = $interestAmount / $dues;
-    //     $monthlyTotal     = $monthlyPrincipal + $monthlyInterest;
-
-
-    //     foreach ($this->repayments as $i => $repay) {
-
-    //         $os = max($principal - ($monthlyPrincipal * $i), 0);
-
-    //         \App\Models\InvoiceLine::create([
-    //             'invoice_id' => $invoice->id,
-    //             'inst_no'    => "INST-" . ($i + 1),
-    //             'due_date'   => $repay->due_date,
-
-    //             'principal'  => round($monthlyPrincipal, 2),
-    //             'interest'   => round($monthlyInterest, 2),
-    //             'total'      => round($monthlyTotal, 2),
-
-    //             'prin_os'    => round($os, 2),
-    //             'km_signature' => null,
-    //         ]);
-    //     }
-
-
-    //     return $invoice;
-    // }
-
     public function generateInvoice()
     {
         if ($this->invoice()->exists()) {

@@ -118,21 +118,32 @@
                         <td>{{ $member->account_number ?? '-' }}</td>
                         <td>{{ $member->ifsc_code ?? '-' }}</td>
                         <!-- <td>{{ $member->group->branch->name ?? '-' }}</td> -->
-                        <td class="text-center">
-                            <a href="{{ route('members.show', $member->id) }}" class="btn btn-outline-secondary btn-sm me-1">
-                                <i class="bi bi-eye"></i>
+                        <td class="text-center d-flex justify-content-between align-items-center">
+                            <!-- Left side: Add Loan -->
+                            <a href="{{ route('loans.create', ['member_id' => $member->id]) }}"
+                                class="btn btn-success btn-sm me-2">
+                                Add Loan
                             </a>
-                            <a href="{{ route('members.edit', $member->id) }}" class="btn btn-outline-primary btn-sm me-1">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <form action="{{ route('members.destroy', $member->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this member?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+
+                            <!-- Right side: View/Edit/Delete -->
+                            <div class="d-flex gap-1">
+                                <a href="{{ route('members.show', $member->id) }}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ route('members.edit', $member->id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <form action="{{ route('members.destroy', $member->id) }}" method="POST" class="d-inline"
+                                    onsubmit="return confirm('Are you sure you want to delete this member?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
+
                     </tr>
                     @empty
                     <tr>

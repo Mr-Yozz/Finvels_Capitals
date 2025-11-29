@@ -67,7 +67,7 @@
         <h2 class="fw-bold text-primary mb-0">
             <i class="bi bi-cash-coin me-2"></i> Loans
         </h2>
-        <a href="{{ route('loans.create') }}" class="btn btn-primary shadow-sm">
+        <a href="{{ route('loans.create', ['member_id' => $member->id]) }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Add Loan
         </a>
 
@@ -123,6 +123,10 @@
                             @endif
                         </td>
                         <td class="text-center">
+                            <a href="{{ route('loans.create', ['member_id' => $loan->member_id]) }}"
+                                class="btn btn-success btn-sm">
+                                Add Loan
+                            </a>
                             <a href="{{ route('loans.show', $loan->id) }}" class="btn btn-outline-secondary btn-sm me-1" title="View">
                                 <i class="bi bi-eye"></i>
                             </a>

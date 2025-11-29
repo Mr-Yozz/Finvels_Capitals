@@ -67,7 +67,7 @@
         <h2 class="fw-bold text-primary mb-0">
             <i class="bi bi-cash-coin me-2"></i> Loans
         </h2>
-        <a href="{{ route('loans.create') }}" class="btn btn-primary shadow-sm">
+        <a href="{{ route('loans.create', ['member_id' => $member->id]) }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Add Loan
         </a>
 

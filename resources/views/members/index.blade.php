@@ -62,9 +62,11 @@
             <h2 class="fw-bold text-primary mb-0">
                 <i class="bi bi-people-fill me-2"></i> Members
             </h2>
-            <a href="{{ route('members.create') }}" class="btn btn-primary shadow-sm">
+            @if(auth()->user()->role === 'admin')
+            <a href="{{ route('members.create', ['group_id' => $group_id]) }}" class="btn btn-success mb-3">
                 <i class="bi bi-plus-lg me-1"></i> Add Member
             </a>
+            @endif
             <button class="btn btn-secondary btn-sm shadow-sm" onclick="history.back()">
                 <i class="bi bi-arrow-left"></i> Back
             </button>

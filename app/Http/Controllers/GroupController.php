@@ -14,21 +14,32 @@ class GroupController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $groups = Group::with('branch')->paginate(15);
-        return view('groups.index', compact('groups'));
+        $branch_id = $request->query('branch_id'); // get branch_id from query string
+
+        $query = Group::with('branch');
+
+        if ($branch_id) {
+            $query->where('branch_id', $branch_id);
+        }
+
+        $groups = $query->paginate(15)->withQueryString();
+
+        return view('groups.index', compact('groups', 'branch_id'));
     }
+
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         //
         $branches = Branch::all();
-        return view('groups.create', compact('branches'));
+        $selectedBranchId = $request->query('branch_id');
+        return view('groups.create', compact('branches', 'selectedBranchId'));
     }
 
     /**

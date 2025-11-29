@@ -25,6 +25,7 @@ class Loan extends Model
         'purpose',
         'spousename',
         'moratorium',
+        'loan_request_id',
     ];
 
     protected $casts = [
@@ -48,6 +49,12 @@ class Loan extends Model
     {
         return $this->hasOne(Invoice::class);
     }
+
+    public function loanRequest()
+    {
+        return $this->belongsTo(LoanRequest::class, 'loan_request_id');
+    }
+
 
     public static function booted()
     {

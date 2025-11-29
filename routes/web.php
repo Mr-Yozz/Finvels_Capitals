@@ -175,6 +175,14 @@ Route::get('/collection-sheet/{groupId}', [CollectionSheetController::class, 'in
 Route::get('collection-sheet/{groupId}/export-pdf', [CollectionSheetController::class, 'exportPdf'])->name('collection.export.pdf');
 Route::get('collection-sheet/{groupId}/export-excel', [CollectionSheetController::class, 'exportExcel'])->name('collection.export.excel');
 
+Route::get('/loans', [LoanController::class, 'groups'])->name('loans.groups');
+
+// Show members of group
+Route::get('/loans/group/{group}', [LoanController::class, 'members'])->name('loans.members');
+
+// Show loans of member
+Route::get('/loans/member/{member}', [LoanController::class, 'memberLoans'])->name('loans.memberLoans');
+
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });

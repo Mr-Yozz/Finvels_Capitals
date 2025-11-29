@@ -8,6 +8,7 @@ use App\Services\RepaymentScheduleService;
 use App\Models\Loan;
 use App\Models\AuditLog;
 use App\Models\Member;
+use App\Models\Group;
 use App\Models\Branch;
 use App\Models\User;
 use App\Models\LoanRequest;
@@ -31,6 +32,28 @@ class LoanController extends Controller
     public function __construct(RepaymentScheduleService $scheduleService)
     {
         $this->scheduleService = $scheduleService;
+    }
+
+    public function groups()
+    {
+        $groups = Group::paginate(15);
+
+        return view('loans.groups', compact('groups'));
+    }
+
+    // LEVEL 2 → Show members of selected group
+    public function members(Group $group)
+    {
+        $members = Member::where('group_id', $group->id)->paginate(15);
+
+        return view('loans.members', compact('group', 'members'));
+    }
+
+    // LEVEL 3 → Show loans of selected member
+    public function memberLoans(Member $member)
+    {
+        $loans = Loan::where('member_id', $member->id)->paginate(15);
+        return view('loans.loans', compact('member', 'loans'));
     }
 
     public function index()

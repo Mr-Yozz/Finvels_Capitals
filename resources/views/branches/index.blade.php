@@ -151,20 +151,51 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $branch->name }}</td>
                     <td>{{ $branch->address }}</td>
-                    <td class="text-center text-nowrap">
-                        <a href="{{ route('branches.show', $branch->id) }}" class="btn btn-sm btn-outline-primary me-1">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="{{ route('branches.edit', $branch->id) }}" class="btn btn-sm btn-outline-warning me-1">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <form action="{{ route('branches.destroy', $branch->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this branch?')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
+
+                    {{-- Actions column --}}
+                    <td class="text-center">
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            {{-- LEFT: Always show View --}}
+                            <a href="{{ route('groups.index', ['branch_id' => $branch->id]) }}"
+                                class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-plus-lg me-1"></i> Group
+                            </a>
+
+                            {{-- RIGHT: Admin-only dropdown for Edit/Delete --}}
+                            @if(auth()->user()->role === 'admin')
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-light btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('branches.show', $branch->id) }}">
+                                            <i class="bi bi-eye me-2"></i>Show
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('branches.edit', $branch->id) }}">
+                                            <i class="bi bi-pencil-square me-2"></i>Edit
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <form action="{{ route('branches.destroy', $branch->id) }}" method="POST"
+                                            onsubmit="return confirm('Are you sure you want to delete this branch?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-trash me-2"></i>Delete
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                            @endif
+
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -175,6 +206,7 @@
                 </tr>
                 @endforelse
             </tbody>
+
         </table>
     </div>
 

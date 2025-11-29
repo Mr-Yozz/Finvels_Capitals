@@ -18,7 +18,7 @@
     <div class="card p-4">
         <h5 class="fw-bold mb-3">Enter Member Details</h5>
         <!-- route('members.sendOtp') -->
-        <form action="{{ route('members.store') }}" method="POST"> 
+        <form action="{{ route('members.store') }}" method="POST">
             @csrf
 
             <div class="mb-3">
@@ -52,7 +52,7 @@
                 <input type="text" name="bank_name" class="form-control">
             </div>
 
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label>Select Branch</label>
                 <select name="branch_id" class="form-select" required>
                     <option value="">-- Choose --</option>
@@ -60,22 +60,23 @@
                     <option value="{{ $g->id }}">{{ $g->name }}</option>
                     @endforeach
                 </select>
-            </div>
+            </div> -->
 
             <div class="mb-3">
                 <label>IFSC</label>
                 <input type="text" name="ifsc_code" class="form-control" required>
             </div>
 
-            <div class="mb-3">
-                <label>Select Group</label>
-                <select name="group_id" class="form-select" required>
-                    <option value="">-- Choose --</option>
-                    @foreach(\App\Models\Group::all() as $g)
-                    <option value="{{ $g->id }}">{{ $g->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+            <select name="group_id" class="form-select" required>
+                <option value="">Select Group</option>
+                @foreach($groups as $group)
+                <option value="{{ $group->id }}"
+                    {{ (old('group_id', $selectedGroupId ?? '') == $group->id) ? 'selected' : '' }}>
+                    {{ $group->name }}
+                </option>
+                @endforeach
+            </select>
+
 
             <button class="btn btn-success w-100">Create Member</button>
         </form>

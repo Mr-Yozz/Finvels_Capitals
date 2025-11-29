@@ -21,21 +21,36 @@ class MemberController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $members = Member::with('group.branch')->paginate(15);
-        return view('members.index', compact('members'));
+        $group_id = $request->query('group_id');
+
+        $query = Member::with(['user', 'group']);
+
+        if ($group_id) {
+            $query->where('group_id', $group_id);
+        }
+
+        $members = $query->paginate(15)->withQueryString();
+
+        return view('members.index', compact('members', 'group_id'));
     }
+
+
+
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $branches = Branch::all();
         $groups = Group::all();
-        return view('members.create', compact('branches', 'groups'));
+        $selectedGroupId = $request->query('group_id'); // read from URL
+
+        return view('members.create', compact('groups', 'selectedGroupId'));
     }
+
 
     /**
      * Store a newly created resource in storage.

@@ -131,7 +131,7 @@
     document.getElementById("principal").addEventListener("input", function() {
         let principal = parseFloat(this.value);
         if (!isNaN(principal)) {
-            let pf = principal * 0.015; // 1.5%
+            let pf = principal * 0.03; // 3%
             let gst = pf * 0.18; // 18% GST
             let total = pf + gst;
             document.getElementById("processing_fee").value = total.toFixed(2);

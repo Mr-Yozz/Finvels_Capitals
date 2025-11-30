@@ -131,7 +131,7 @@
     <p><strong class="text-primary">Branch:</strong> {{ $loan->branch->name ?? '-' }}</p>
     <p><strong class="text-primary">Principal:</strong> {{ number_format($loan->principal,2) }}</p>
     <p><strong class="text-primary">Interest Rate:</strong> {{ $loan->interest_rate }}%</p>
-    <p><strong class="text-primary">Tenure:</strong> {{ $loan->tenure_months }} months</p>
+    <p><strong class="text-primary">Tenure:</strong> {{ $loan->tenure_months }}</p>
     @if($loan->repayment_frequency === 'weekly')
     <p><strong class="text-primary">EMI:</strong> ₹{{ number_format($loan->weekly_emi, 2) }}</p>
     @else

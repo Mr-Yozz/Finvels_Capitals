@@ -189,22 +189,33 @@ class LoanController extends Controller
             'principal' => 'required|numeric|min:1',
             'product_name' => 'required|max:225',
             'spousename' => 'required|max:225',
-            'moratorium' => 'nullable|max:225',
+            'moratorium' => 'nullable|integer|min:0',
             'purpose' => 'required|max:225',
-            'repayment_frequency' => 'required',
-            'insurance_amount' => 'required|numeric',
+            'repayment_frequency' => 'required|in:monthly,weekly',
+            'insurance_amount' => 'required|numeric|min:0',
             'interest_rate' => 'required|numeric|min:0',
             'tenure_months' => 'required|integer|min:1',
             'disbursed_at' => 'required|date',
             'status' => 'required|in:pending,active,closed',
+            'processing_fee' => 'required|numeric|min:0',
         ]);
 
-        $data['processing_fee'] = $data['processing_fee'] ?? 0;
-
+        // Update loan details
         $loan->update($data);
+
+        // Remove old repayments + invoice
+        $loan->repayments()->delete();
+        if ($loan->invoice) {
+            $loan->invoice()->delete();
+        }
+
+        // Rebuild new schedule + invoice
+        $loan->refresh();
+        $loan->generateRepaymentsAndInvoice();
 
         return back()->with('success', 'Loan updated successfully!');
     }
+
 
     /**
      * Remove the specified resource from storage.

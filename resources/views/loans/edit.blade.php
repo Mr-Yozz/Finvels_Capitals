@@ -47,26 +47,36 @@
             @error('branch_id') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
-        <!-- PRODUCT NAME -->
+        {{-- Product Name --}}
         <div class="mb-3">
             <label class="form-label text-primary">Product Name</label>
-            <input type="text" name="product_name" class="form-control" placeholder="Example: Pragati Plus Loan">
+            <input type="text" name="product_name" class="form-control"
+                value="{{ old('product_name', $loan->product_name ?? '') }}" required>
+            @error('product_name') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
-        <!-- LOAN PURPOSE -->
+        {{-- Purpose --}}
         <div class="mb-3">
             <label class="form-label text-primary">Loan Purpose</label>
-            <input type="text" name="purpose" class="form-control" placeholder="Example: Tailoring Machine">
+            <input type="text" name="purpose" class="form-control"
+                value="{{ old('purpose', $loan->purpose ?? '') }}" required>
+            @error('purpose') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
+        {{-- Spouse Name --}}
         <div class="mb-3">
             <label class="form-label text-primary">Spouse Name</label>
-            <input type="text" name="spousename" class="form-control" placeholder="Spouse Name">
+            <input type="text" name="spousename" class="form-control"
+                value="{{ old('spousename', $loan->spousename ?? '') }}" required>
+            @error('spousename') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
+        {{-- Moratorium --}}
         <div class="mb-3">
             <label class="form-label text-primary">Moratorium</label>
-            <input type="text" name="moratorium" class="form-control" placeholder="Moratorium">
+            <input type="number" name="moratorium" class="form-control"
+                value="{{ old('moratorium', $loan->moratorium ?? 0) }}">
+            @error('moratorium') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
         {{-- Principal --}}
@@ -91,32 +101,33 @@
         <div class="mb-3">
             <label class="form-label text-primary">Tenure (Months)</label>
             <input type="number" name="tenure_months" class="form-control"
-                value="{{ old('tenure_months', $loan->tenure_months ?? '') }}"
-                required>
+                value="{{ old('tenure_months', $loan->tenure_months ?? '') }}" required>
             @error('tenure_months') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
-        <!-- REPAYMENT FREQUENCY -->
+        {{-- Repayment Frequency --}}
         <div class="mb-3">
             <label class="form-label text-primary">Repayment Frequency</label>
             <select name="repayment_frequency" class="form-select" required>
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
+                <option value="monthly" {{ old('repayment_frequency', $loan->repayment_frequency ?? '') == 'monthly' ? 'selected' : '' }}>Monthly</option>
+                <option value="weekly" {{ old('repayment_frequency', $loan->repayment_frequency ?? '') == 'weekly' ? 'selected' : '' }}>Weekly</option>
             </select>
         </div>
 
-        <!-- PROCESSING FEE -->
+        {{-- Processing Fee --}}
         <div class="mb-3">
-            <label class="form-label text-primary">
-                Processing Fee (1.5% + GST Auto)
-            </label>
-            <input type="number" id="processing_fee" name="processing_fee" class="form-control" readonly>
+            <label class="form-label text-primary">Processing Fee (3% + GST Auto)</label>
+            <input type="number" id="processing_fee" name="processing_fee" class="form-control"
+                value="{{ old('processing_fee', $loan->processing_fee ?? '') }}" readonly required>
+            @error('processing_fee') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
-        <!-- INSURANCE -->
+        {{-- Insurance --}}
         <div class="mb-3">
             <label class="form-label text-primary">Insurance Amount</label>
-            <input type="number" name="insurance_amount" class="form-control" placeholder="Enter amount" required>
+            <input type="number" name="insurance_amount" class="form-control"
+                value="{{ old('insurance_amount', $loan->insurance_amount ?? '') }}" required>
+            @error('insurance_amount') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
         {{-- Disbursed Date --}}
@@ -146,15 +157,14 @@
 @endsection
 
 @section('scripts')
+{{-- AUTO CALCULATE PROCESSING FEE --}}
 <script>
-    document.getElementById("principal").addEventListener("input", function() {
-        let principal = parseFloat(this.value);
-        if (!isNaN(principal)) {
-            let pf = principal * 0.015; // 1.5%
-            let gst = pf * 0.18; // 18% GST
-            let total = pf + gst;
-            document.getElementById("processing_fee").value = total.toFixed(2);
-        }
+    document.getElementById('principal').addEventListener('input', function() {
+        let principal = parseFloat(this.value) || 0;
+        let pf = principal * 0.03; // 3%
+        let gst = pf * 0.18; // 18% GST
+        let total = pf + gst; // 3.54%
+        document.getElementById('processing_fee').value = total.toFixed(2);
     });
 </script>
 @endsection

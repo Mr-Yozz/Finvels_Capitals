@@ -115,14 +115,15 @@ class Loan extends Model
         if ($this->repayment_frequency === 'monthly') {
             $R = ($annualRate / 100) / 12;
             $prefix = 'MONTH';
-            $nextDate = $disbursed->copy()->addMonth();
+            // Set first due date to 2nd of next month
+            $nextDate = $disbursed->copy()->addMonth()->day(2);
             $interval = 'month';
         }
         // Weekly frequency
         else {
             $R = ($annualRate / 100) / 52;
             $prefix = 'WEEK';
-            $nextDate = $disbursed->copy()->addDays(7);
+            $nextDate = $disbursed->copy()->addWeek();
             $interval = 'week';
         }
 
@@ -187,9 +188,14 @@ class Loan extends Model
             ];
 
             $firstPayment = false;
-            $nextDate = $nextDate->copy()->add($interval, 1);
-            if ($interval === 'week') {
-                $nextDate->addDay();
+
+            // Calculate next due date
+            if ($interval === 'month') {
+                // For monthly: always set to 2nd of next month
+                $nextDate = $nextDate->copy()->addMonth()->day(2);
+            } else {
+                // For weekly: add week 
+                $nextDate = $nextDate->copy()->addWeek();
             }
         }
 

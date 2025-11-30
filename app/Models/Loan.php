@@ -26,6 +26,8 @@ class Loan extends Model
         'spousename',
         'moratorium',
         'paid_amount',
+        'created_by',
+        'is_approved',
     ];
 
     protected $casts = [
@@ -57,6 +59,15 @@ class Loan extends Model
     }
 
     // --- Booting and Scopes ---
+    public static function booted()
+    {
+        // Automatically set created_by if not provided
+        static::creating(function ($loan) {
+            if (empty($loan->created_by) && Auth::check()) {
+                $loan->created_by = Auth::id();
+            }
+        });
+    }
     // public static function booted()
     // {
     //     static::created(function ($loan) {
@@ -91,54 +102,77 @@ class Loan extends Model
     {
         $schedule = [];
 
-
         $P = floatval($this->principal);
         $annualRate = floatval($this->interest_rate);
-        $N = max(1, intval($this->tenure_months)); // total periods
+        $N = max(1, intval($this->tenure_months));
         $moratorium = intval($this->moratorium ?? 0);
 
         $disbursed = $this->disbursed_at
             ? \Carbon\Carbon::parse($this->disbursed_at)
             : \Carbon\Carbon::now();
 
+        // Monthly frequency
         if ($this->repayment_frequency === 'monthly') {
-            $R = ($annualRate / 100) / 12; // monthly rate
+            $R = ($annualRate / 100) / 12;
             $prefix = 'MONTH';
             $nextDate = $disbursed->copy()->addMonth();
             $interval = 'month';
-        } else { // weekly
-            $R = ($annualRate / 100) / 52; // weekly rate
+        }
+        // Weekly frequency
+        else {
+            $R = ($annualRate / 100) / 52;
             $prefix = 'WEEK';
-            $nextDate = $disbursed->copy()->addDays(8); // weekly + 1 day
+            $nextDate = $disbursed->copy()->addDays(7);
             $interval = 'week';
         }
 
         $balance = $P;
         $firstPayment = true;
 
+        // Number of interest-only periods
+        $interestOnlyPeriods = $moratorium + ($firstInterestOnly ? 1 : 0);
+
+        // Regular EMI periods = N - interest-only periods
+        $regularPeriods = $N - $interestOnlyPeriods;
+
+        // EMI is calculated ONLY on remaining periods (important!)
+        $EMI = 0;
+        if ($regularPeriods > 0 && $R > 0) {
+            $EMI = round(
+                $P * $R * pow(1 + $R, $regularPeriods) /
+                    (pow(1 + $R, $regularPeriods) - 1),
+                2
+            );
+        } else if ($regularPeriods > 0) {
+            $EMI = round($P / $regularPeriods, 2);
+        }
+
         for ($i = 1; $i <= $N; $i++) {
 
+            // Month-1 OR moratorium = interest-only
             $interestOnly = ($firstPayment && $firstInterestOnly) || ($i <= $moratorium);
 
             if ($interestOnly) {
+                // Only interest
                 $interest = round($balance * $R, 2);
                 $principal = 0;
-                $EMI = $interest;
+                $payment = $interest;
             } else {
-                // Remaining periods after interest-only/moratorium
-                $remainingPeriods = $N - max($moratorium, $firstInterestOnly ? 1 : 0) - ($i - max($moratorium, $firstInterestOnly ? 1 : 0) - 1);
-                $EMI = round($balance * $R * pow(1 + $R, $remainingPeriods) / (pow(1 + $R, $remainingPeriods) - 1), 2);
+                // Standard EMI amortization
                 $interest = round($balance * $R, 2);
                 $principal = round($EMI - $interest, 2);
-                $principal = max(0, $principal); // ensure positive
+                if ($principal < 0) $principal = 0;
+                $payment = $EMI;
             }
 
-            // Last installment adjustment
+            // FINAL MONTH → clear remaining balance exactly
             if ($i == $N) {
-                $principal = $balance;
-                $EMI = $principal + $interest;
+                $interest = round($balance * $R, 2);
+                $principal = round($balance, 2);
+                $payment = round($principal + $interest, 2);
             }
 
+            // Update remaining principal
             $balance = round($balance - $principal, 2);
             if ($balance < 0) $balance = 0;
 
@@ -147,28 +181,29 @@ class Loan extends Model
                 'date' => $nextDate->format('Y-m-d'),
                 'principal' => $principal,
                 'interest' => $interest,
-                'total' => $EMI,
+                'total' => $payment,
                 'prin_os' => $balance,
                 'loan_instance' => $prefix . "-$i",
             ];
 
             $firstPayment = false;
-            $nextDate = $nextDate->copy()->add($interval, 1); // month/week
+            $nextDate = $nextDate->copy()->add($interval, 1);
             if ($interval === 'week') {
-                $nextDate->addDay(); // weekly +1 day
+                $nextDate->addDay();
             }
         }
 
-        // Save EMI for display
+        // Save EMI value for reference
         if ($this->repayment_frequency === 'monthly') {
             $this->monthly_emi = $EMI;
         } else {
             $this->weekly_emi = $EMI;
         }
-        $this->saveQuietly();
 
+        $this->saveQuietly();
         return $schedule;
     }
+
 
 
     /**

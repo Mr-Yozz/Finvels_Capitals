@@ -123,8 +123,8 @@ class CollectionSheetController extends Controller
                 // If we found a repayment due on the selected date, use it
                 if ($repaymentDueOnDate) {
                     // Calculate total amount (principal + interest)
-                    $repaymentAmount = (float)($repaymentDueOnDate->principal_component ?? $repaymentDueOnDate->amount ?? 0) + 
-                                      (float)($repaymentDueOnDate->interest_component ?? 0);
+                    $repaymentAmount = (float)($repaymentDueOnDate->principal_component ?? $repaymentDueOnDate->amount ?? 0) +
+                        (float)($repaymentDueOnDate->interest_component ?? 0);
                     $repaymentDate = $repaymentDueOnDate->due_date;
 
                     // Sum up amounts if multiple repayments exist for this date (across loans)
@@ -285,8 +285,8 @@ class CollectionSheetController extends Controller
 
             if ($nextUnpaidRepayment) {
                 // Calculate total amount (principal + interest)
-                $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) + 
-                                  (float)($nextUnpaidRepayment->interest_component ?? 0);
+                $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) +
+                    (float)($nextUnpaidRepayment->interest_component ?? 0);
                 $repaymentDate = $nextUnpaidRepayment->due_date;
 
                 // Keep the earliest date
@@ -407,8 +407,8 @@ class CollectionSheetController extends Controller
                 // If we found a repayment due on the selected date, use it
                 if ($repaymentDueOnDate) {
                     // Calculate total amount (principal + interest)
-                    $repaymentAmount = (float)($repaymentDueOnDate->principal_component ?? $repaymentDueOnDate->amount ?? 0) + 
-                                      (float)($repaymentDueOnDate->interest_component ?? 0);
+                    $repaymentAmount = (float)($repaymentDueOnDate->principal_component ?? $repaymentDueOnDate->amount ?? 0) +
+                        (float)($repaymentDueOnDate->interest_component ?? 0);
                     $repaymentDate = $repaymentDueOnDate->due_date;
 
                     // Sum up amounts if multiple repayments exist for this date (across loans)
@@ -548,30 +548,40 @@ class CollectionSheetController extends Controller
 
     public function exportPdf(Request $request, $groupId)
     {
-        $date = $request->query('date', Carbon::now()->toDateString());
+        $date = $request->query('date', now()->toDateString());
 
-        // reuse your index logic to get rows, summary, group, manager
+        // Reuse your data
         $viewData = $this->prepareCollectionData($groupId, $date);
 
-        // prepare base64 logo (works on Hostinger / shared hosts)
-        $logo = null;
-        $logoPath = public_path('images/finvels.jpeg');
+        // Filter rows here (so blade does NOT calculate)
+        $filteredRows = collect($viewData['rows'])->filter(function ($r) {
+            return isset($r['has_due_on_date']) &&
+                $r['has_due_on_date'] &&
+                ($r['next_due_amount'] ?? 0) > 0;
+        });
 
-        if (file_exists($logoPath)) {
-            $logo = base64_encode(file_get_contents($logoPath));
-        }
+        // Add logo path
+        $logoFile = public_path('images/finvels.png');
+        $logoBase64 = file_exists($logoFile)
+            ? base64_encode(file_get_contents($logoFile))
+            : null;
 
-        // Merge view data and logo into a single array
-        $data = array_merge($viewData, ['logo' => $logo]);
+        // Add back into array
+        $data = array_merge($viewData, [
+            'filteredRows'     => $filteredRows,
+            'logoBase64'   => $logoBase64,
+            'date'             => $date
+        ]);
 
-        // Load the same blade used for the HTML view and generate PDF
-        $pdf = PDF::loadView('collection_sheet.index', $data)
+        $pdf = PDF::loadView('collection_sheet.pdf', $data)
             ->setPaper('a4', 'landscape');
 
-        $fileName = 'Collection_Sheet_' . ($viewData['group']->name ?? 'group') . '_' . $date . '.pdf';
+        $fileName = "Collection_Sheet_{$viewData['group']->name}_{$date}.pdf";
 
         return $pdf->download($fileName);
     }
+
+
 
     public function exportExcel(Request $request, $groupId)
     {

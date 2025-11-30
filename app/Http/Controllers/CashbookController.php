@@ -123,9 +123,15 @@ class CashbookController extends Controller
             ->whereDate('disbursed_at', $date)
             ->get();
 
-        $logo = public_path('images/logo.png');
+        $logoPath = public_path('images/finvels.jpeg');
 
-        $pdf = PDF::loadView('cashbook.report_pdf', compact('cashbook', 'loans', 'date', 'logo'))
+        // Convert logo to Base64
+        $logo = null;
+        if (file_exists($logoPath)) {
+            $logo = base64_encode(file_get_contents($logoPath));
+        }
+
+        $pdf = PDF::loadView('exports.cashbook_pdf', compact('cashbook', 'loans', 'date', 'logo'))
             ->setPaper('A4', 'portrait');
 
         return $pdf->download("Cashbook-{$date}.pdf");

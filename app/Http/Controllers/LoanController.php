@@ -219,9 +219,21 @@ class LoanController extends Controller
     public function exportPdf()
     {
         $loans = Loan::with(['member', 'branch'])->get();
-        $pdf = Pdf::loadView('exports.loans_pdf', compact('loans'));
+
+        // Logo path
+        $logoPath = public_path('images/finvels.jpeg');
+
+        // Convert to Base64
+        $logo = null;
+        if (file_exists($logoPath)) {
+            $logo = base64_encode(file_get_contents($logoPath));
+        }
+
+        $pdf = Pdf::loadView('exports.loans_pdf', compact('loans', 'logo'));
+
         return $pdf->download('loans_report.pdf');
     }
+
 
     // Excel Export
     public function exportExcel()
@@ -235,9 +247,19 @@ class LoanController extends Controller
     {
         $invoice = Invoice::with(['loan.member', 'lines'])->findOrFail($id);
 
-        $pdf = Pdf::loadView('exports.invoice_pdf', compact('invoice'));
+        // Absolute path to the logo
+        $logoPath = public_path('images/finvels.jpeg');
+
+        // Convert image → Base64
+        $logo = null;
+        if (file_exists($logoPath)) {
+            $logo = base64_encode(file_get_contents($logoPath));
+        }
+
+        $pdf = Pdf::loadView('exports.invoice_pdf', compact('invoice', 'logo'));
         return $pdf->download('invoice_' . $invoice->invoice_no . '.pdf');
     }
+
 
     public function exportExcel_in($id)
     {

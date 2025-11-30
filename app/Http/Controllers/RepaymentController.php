@@ -17,37 +17,6 @@ use Carbon\Carbon;
 
 class RepaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    // public function index()
-    // {
-    //     $repayments = Repayment::with('loan.member')->latest()->paginate(10);
-    //     return view('repayments.index', compact('repayments'));
-    // }
-
-    // public function index(Request $request)
-    // {
-    //     // If a specific member is selected, show their repayments
-    //     if ($request->has('member_id')) {
-    //         $member = Member::findOrFail($request->member_id);
-
-    //         $repayments = Repayment::with('loan')
-    //             ->whereHas('loan', function ($q) use ($member) {
-    //                 $q->where('member_id', $member->id);
-    //             })
-    //             ->latest()
-    //             ->paginate(10);
-
-    //         return view('repayments.index', compact('repayments', 'member'));
-    //     }
-
-    //     // Otherwise, show the member list
-    //     // $members = Member::orderBy('name')->get();
-    //     $members = Member::orderBy('name', 'asc')->paginate(12);
-
-    //     return view('repayments.members', compact('members'));
-    // }
 
     public function index(Request $request)
     {
@@ -298,8 +267,16 @@ class RepaymentController extends Controller
         // Fetch all repayments with loan & member relation
         $repayments = Repayment::with('loan.member')->latest()->get();
 
+        // Logo path
+        $logoPath = public_path('images/finvels.jpeg');
+
+        // Convert logo to Base64
+        $logo = null;
+        if (file_exists($logoPath)) {
+            $logo = base64_encode(file_get_contents($logoPath));
+        }
         // Load PDF view
-        $pdf = Pdf::loadView('exports.repayments_pdf', compact('repayments'));
+        $pdf = Pdf::loadView('exports.repayments_pdf', compact('repayments','logo'));
 
         return $pdf->download('repayments_report.pdf');
     }

@@ -18,9 +18,11 @@
 
 <body>
 
-    <div style="text-align:center;">
-        <img src="{{ $logo }}" height="80">
-        <h3>Cashbook Report - {{ $date }}</h3>
+    <div style="text-align:left; margin-bottom:20px;">
+        @if(!empty($logo))
+        <img src="data:image/jpeg;base64,{{ $logo }}"
+            style="height:80px; width:80px; border-radius:50%; object-fit:cover;">
+        @endif
     </div>
 
     <table>
@@ -75,37 +77,37 @@
             <th>Total</th>
         </tr>
         <tr>
-            <td>2000</td>
+            <td>2000    X </td>
             <td></td>
             <td></td>
         </tr>
         <tr>
-            <td>500</td>
+            <td>500    X </td>
             <td></td>
             <td></td>
         </tr>
         <tr>
-            <td>200</td>
+            <td>200    X </td>
             <td></td>
             <td></td>
         </tr>
         <tr>
-            <td>100</td>
+            <td>100    X </td>
             <td></td>
             <td></td>
         </tr>
         <tr>
-            <td>50</td>
+            <td>50    X </td>
             <td></td>
             <td></td>
         </tr>
         <tr>
-            <td>20</td>
+            <td>20    X </td>
             <td></td>
             <td></td>
         </tr>
         <tr>
-            <td>10</td>
+            <td>10    X </td>
             <td></td>
             <td></td>
         </tr>

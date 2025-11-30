@@ -22,11 +22,13 @@
 
     <div style="text-align:left; margin-bottom:20px;">
         @if(!empty($logo))
-        <img src="data:image/jpeg;base64,{{ $logo }}" style="height:80px; width:80px; border-radius:50%; object-fit:cover;">
+        <img src="data:image/jpeg;base64,{{ $logo }}"
+            style="height:80px; width:80px; border-radius:50%; object-fit:cover;">
         @else
-        <img src="{{ asset('images/finvels.jpeg') }}" style="height:80px; width:80px; border-radius:50%; object-fit:cover;">
+        <p>Logo not found</p>
         @endif
     </div>
+
 
     <h2 style="margin-bottom: 10px;">Invoice #{{ $invoice->invoice_no }}</h2>
 

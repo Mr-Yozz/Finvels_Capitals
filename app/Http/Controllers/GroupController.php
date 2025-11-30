@@ -106,7 +106,15 @@ class GroupController extends Controller
     public function exportPdf()
     {
         $groups = Group::with('branch')->get();
-        $pdf = Pdf::loadView('exports.groups_pdf', compact('groups'));
+        // Logo path
+        $logoPath = public_path('images/finvels.jpeg');
+
+        // Convert logo to Base64
+        $logo = null;
+        if (file_exists($logoPath)) {
+            $logo = base64_encode(file_get_contents($logoPath));
+        }
+        $pdf = Pdf::loadView('exports.groups_pdf', compact('groups', 'logo'));
         return $pdf->download('groups_report.pdf');
     }
 

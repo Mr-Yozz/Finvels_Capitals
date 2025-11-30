@@ -66,7 +66,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach([2000,500,200,100,50,20,10,5,2,1] as $den)
+            @foreach(['2000 X ','500 X','200 X','100 X','50 X','20 X','10 X','5 X','2 X','1 X'] as $den)
             <tr>
                 <td>{{ $den }}</td>
                 <td></td>

@@ -36,13 +36,6 @@ class MemberController extends Controller
         return view('members.index', compact('members', 'group_id'));
     }
 
-
-
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request)
     {
         $groups = Group::all();
@@ -51,52 +44,6 @@ class MemberController extends Controller
         return view('members.create', compact('groups', 'selectedGroupId'));
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(Request $request)
-    // {
-
-    //     $email = $request->name . $request->mobile . '@member.local'; // add default mail to create
-
-    //     $user = User::create([
-    //         'name' => $request->name,
-    //         'phone' => $request->mobile,
-    //         'email' => $email,
-    //         'password' => Hash::make('123456'), // Default Password
-    //         'role' => 'user'
-    //     ]);
-
-    //     $data = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'mobile' => 'required|string|max:20',
-    //         'aadhaar_encrypted' => 'required|string',
-    //         'pan_encrypted' => 'required|string',
-    //         'bank_name' => 'nullable|string',
-    //         'account_number' => 'required|string',
-    //         'branch_name' => 'nullable|string',
-    //         'ifsc_code' => 'required|string|max:50',
-    //         'group_id' => 'required|exists:groups,id',
-    //     ]);
-
-    //     // manually add user id
-    //     // $data['user_id'] = $user->id;
-
-
-    //     $member = Member::create($request->all());
-
-    //     // OPTIONAL: Link user_id in Member table if column exists
-    //     if ($member->fillable && in_array('user_id', $member->getFillable())) {
-    //         $member->update(['user_id' => $user->id]);
-    //     }
-
-
-
-    //     // return redirect()->route('members.index')->with('success', 'Member created successfully!');
-    //     return redirect()->route('members.create')
-    //         ->with('success', 'Member created successfully!');
-    // }
 
     public function store(Request $request)
     {
@@ -306,7 +253,15 @@ class MemberController extends Controller
     public function exportPdf()
     {
         $members = Member::with(['group.branch'])->get();
-        $pdf = Pdf::loadView('exports.members_pdf', compact('members'));
+        // Logo path
+        $logoPath = public_path('images/finvels.jpeg');
+
+        // Convert logo to Base64
+        $logo = null;
+        if (file_exists($logoPath)) {
+            $logo = base64_encode(file_get_contents($logoPath));
+        }
+        $pdf = Pdf::loadView('exports.members_pdf', compact('members', 'logo'));
         return $pdf->download('members_report.pdf');
     }
 

@@ -135,9 +135,21 @@ class BranchController extends Controller
     public function exportPdf()
     {
         $branches = Branch::withCount(['groups', 'loans', 'users'])->get();
-        $pdf = Pdf::loadView('exports.branches_pdf', compact('branches'));
+
+        // Logo path
+        $logoPath = public_path('images/finvels.jpeg');
+
+        // Convert logo to Base64
+        $logo = null;
+        if (file_exists($logoPath)) {
+            $logo = base64_encode(file_get_contents($logoPath));
+        }
+
+        // Return PDF
+        $pdf = Pdf::loadView('exports.branches_pdf', compact('branches', 'logo'));
         return $pdf->download('branches_report.pdf');
     }
+
 
     // Excel Export
     public function exportExcel()

@@ -34,6 +34,12 @@
 
 <body>
     <h3>Members Report</h3>
+    <div style="text-align:left; margin-bottom:20px;">
+        @if(!empty($logo))
+        <img src="data:image/jpeg;base64,{{ $logo }}"
+            style="height:80px; width:80px; border-radius:50%; object-fit:cover;">
+        @endif
+    </div>
     <table>
         <thead>
             <tr>

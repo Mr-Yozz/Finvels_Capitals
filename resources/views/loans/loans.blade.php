@@ -64,17 +64,30 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <!-- Left: Title -->
         <h2 class="fw-bold text-primary mb-0">
             <i class="bi bi-cash-coin me-2"></i> Loans
         </h2>
+
+        <!-- Center: Search -->
+        <div class="flex-grow-1 px-4">
+            <input type="text" id="searchLoan" class="form-control" placeholder="Search loans...">
+        </div>
+
+        <!-- Right: Add Button -->
         <a href="{{ route('loans.create', ['member_id' => $member->id]) }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Add Loan
         </a>
-
-        <div class="mb-3">
-            <input type="text" id="searchLoan" class="form-control" placeholder="Search loans...">
-        </div>
     </div>
+
+    <!-- Back Button under Header -->
+    <div class="mb-3">
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left me-1"></i> Back
+        </a>
+    </div>
+
 
     <div class="mb-3 d-flex gap-2">
         <a href="{{ route('loans.export.excel') }}" class="btn btn-success btn-sm">

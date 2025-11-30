@@ -1,100 +1,63 @@
 @extends('layouts.app')
 
 @section('styles')
-{{-- Bootstrap Icons --}}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
 <style>
-    /* ===== Table & Layout ===== */
-    #groupTable {
+    .card {
+        border-radius: 10px;
+        background: #fff;
+    }
+
+    .table {
         border-collapse: separate;
         border-spacing: 0;
-        font-size: 0.9rem;
     }
 
-    #groupTable thead th {
-        background-color: #f8f9fa;
-        font-weight: 600;
+    .table th {
+        background-color: #e9f3ff !important;
         text-transform: uppercase;
-        font-size: 0.85rem;
-        border-bottom: 2px solid #dee2e6;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        padding: 12px;
     }
 
-    #groupTable tbody tr:hover {
-        background-color: #f5f9ff;
-        transition: background-color 0.3s ease;
-    }
-
-    #groupTable td,
-    #groupTable th {
-        padding: 0.8rem 1rem;
+    .table td {
         vertical-align: middle;
+        padding: 12px;
     }
 
-    /* ===== Buttons ===== */
-    .btn-sm {
-        font-size: 0.8rem;
+    .table-hover tbody tr:hover {
+        background-color: #f5f9ff !important;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-size: 13px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 6px 10px;
         border-radius: 6px;
     }
 
-    .btn-outline-primary:hover {
-        background-color: #0d6efd;
-        color: #fff;
+    .text-primary {
+        color: #0d6efd !important;
     }
 
-    .btn-outline-warning:hover {
-        background-color: #ffc107;
-        color: #000;
+    .table thead th {
+        border-bottom: 2px solid #dee2e6;
     }
 
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: #fff;
-    }
-
-    /* ===== Alert ===== */
-    .alert {
-        font-size: 0.9rem;
-    }
-
-    /* ===== Pagination ===== */
-    .pagination {
-        margin-top: 1rem;
-    }
-
-    .page-item.active .page-link {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-    }
-
-    /* ===== Responsive Design ===== */
-    @media (max-width: 768px) {
-        h2.text-primary {
-            font-size: 1.4rem;
-        }
-
-        .table-responsive {
-            padding: 0.5rem;
-        }
-
-        #groupTable th,
-        #groupTable td {
-            font-size: 0.85rem;
-            padding: 0.5rem;
-        }
-
-        td.text-center.text-nowrap {
-            white-space: normal !important;
-        }
-
-        .btn-sm {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .btn i {
-            margin: 0;
-        }
+    .table td,
+    .table th {
+        border-color: #dee2e6 !important;
     }
 </style>
 @endsection
@@ -148,7 +111,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $group->name }}</td>
                     <td>{{ $group->branch->name ?? '-' }}</td>
-                    
+
                     <td class="text-center text-nowrap">
                         <div class="d-flex justify-content-between align-items-center">
 

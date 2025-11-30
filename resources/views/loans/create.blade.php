@@ -2,7 +2,11 @@
 
 @section('content')
 <h2 class="text-primary mb-3">Add Loan</h2>
-
+<div class="mb-3">
+    <a href="{{ url()->previous() }}" class="btn btn-secondary">
+        <i class="fa fa-arrow-left me-1"></i> Back
+    </a>
+</div>
 <div class="card p-4">
     <form action="{{ route('loans.store') }}" method="POST">
         @csrf

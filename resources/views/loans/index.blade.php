@@ -70,7 +70,9 @@
         <a href="{{ route('loans.create', ['member_id' => $member->id]) }}" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Add Loan
         </a>
-
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Back
+        </a>
         <div class="mb-3">
             <input type="text" id="searchLoan" class="form-control" placeholder="Search loans...">
         </div>

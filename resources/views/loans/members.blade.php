@@ -62,8 +62,7 @@
 @endsection
 @section('content')
 <div class="container mt-4">
-    <h3>Members of {{ $group->name }}</h3>
-
+    <h2 class="text-primary fw-bold mb-0">Members of {{ $group->name }}</h2>
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">

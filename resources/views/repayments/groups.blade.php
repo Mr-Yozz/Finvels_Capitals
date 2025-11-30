@@ -1,8 +1,15 @@
 @extends('layouts.app')
-
+@section('styles')
+<style>
+    .text-primary {
+        color: #0d6efd !important;
+    }
+</style>
+@endsection
 @section('content')
 <div class="container py-4">
-    <h4 class="mb-4">📋 Groups</h4>
+    <h2 class="text-primary fw-bold mb-0">Groups</h2>
+
 
     <form class="mb-3">
         <div class="row g-2 align-items-end">

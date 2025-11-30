@@ -62,7 +62,7 @@
 @endsection
 @section('content')
 <div class="container mt-4">
-    <h3>All Groups</h3>
+    <h2 class="text-primary fw-bold mb-0">All Groups</h2>
     <table class="table">
         <tr>
             <th>Group Name</th>

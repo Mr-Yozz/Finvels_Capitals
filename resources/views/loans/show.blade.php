@@ -121,6 +121,9 @@
 
 @section('content')
 <h2 class="text-primary mb-3">Loan Details</h2>
+<a href="{{ url()->previous() }}" class="btn btn-secondary">
+    <i class="fa fa-arrow-left"></i> Back
+</a>
 
 <div class="card p-4">
     <p><strong class="text-primary">ID:</strong> {{ $loan->id }}</p>

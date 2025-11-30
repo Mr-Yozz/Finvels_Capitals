@@ -114,22 +114,23 @@ class CollectionSheetController extends Controller
                 $memberDueInstances[] = "{$productLabel}: " . number_format($todayDueAmount, 2);
                 $memberDueTotal += $todayDueAmount;
 
-                // Find the next unpaid repayment for this loan (for displaying next due)
-                $nextUnpaidRepayment = $loan->repayments()
+                // Find repayments due on the selected date (not next due, but due on this specific date)
+                $repaymentDueOnDate = $loan->repayments()
+                    ->whereDate('due_date', $dateCarbon->toDateString())
                     ->whereIn('status', ['due', 'partial'])
-                    ->orderBy('due_date', 'asc')
                     ->first();
 
-                // Update next due if we found an unpaid repayment
-                if ($nextUnpaidRepayment) {
+                // If we found a repayment due on the selected date, use it
+                if ($repaymentDueOnDate) {
                     // Calculate total amount (principal + interest)
-                    $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) +
-                        (float)($nextUnpaidRepayment->interest_component ?? 0);
-                    $repaymentDate = $nextUnpaidRepayment->due_date;
+                    $repaymentAmount = (float)($repaymentDueOnDate->principal_component ?? $repaymentDueOnDate->amount ?? 0) + 
+                                      (float)($repaymentDueOnDate->interest_component ?? 0);
+                    $repaymentDate = $repaymentDueOnDate->due_date;
 
-                    // Keep the earliest date across all loans for this member
-                    if (!$nextDueDate || $repaymentDate < $nextDueDate) {
-                        $nextDueAmount = $repaymentAmount;
+                    // Sum up amounts if multiple repayments exist for this date (across loans)
+                    $nextDueAmount += $repaymentAmount;
+                    // Set date (will be same for all repayments on this date)
+                    if (!$nextDueDate) {
                         $nextDueDate = $repaymentDate;
                     }
                 }
@@ -188,6 +189,7 @@ class CollectionSheetController extends Controller
                 'due_total' => round($memberDueTotal, 2),
                 'next_due_amount' => round($nextDueAmount, 2),
                 'next_due_date' => $nextDueDate ? $nextDueDate->format('Y-m-d') : null,
+                'has_due_on_date' => $nextDueAmount > 0, // Flag to check if member has any due on selected date
                 'member_adv' => round($memberAdvSum, 2),
                 'due_disb' => round($dueDisbSum, 2),
                 'spouse_kyc' => $spouseCandidate,
@@ -196,11 +198,13 @@ class CollectionSheetController extends Controller
                 'lp_pa_l' => $lpPalValue,
             ];
 
-            // accumulate summary
-            $summary['due_collections'] += $memberDueTotal;
-            $summary['due_disbursements'] += $dueDisbSum;
-            $summary['other_collections'] += $memberAdvSum + $prSum + $sanchaySum;
-            $summary['other_disbursements'] += 0; // update if you have other disbursement fields
+            // accumulate summary only for members with dues on the selected date
+            if ($nextDueAmount > 0) {
+                $summary['due_collections'] += $nextDueAmount; // Use next_due_amount (due on selected date) instead of memberDueTotal
+                $summary['due_disbursements'] += $dueDisbSum;
+                $summary['other_collections'] += $memberAdvSum + $prSum + $sanchaySum;
+                $summary['other_disbursements'] += 0; // update if you have other disbursement fields
+            }
         }
 
         // finalize summary totals
@@ -281,8 +285,8 @@ class CollectionSheetController extends Controller
 
             if ($nextUnpaidRepayment) {
                 // Calculate total amount (principal + interest)
-                $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) +
-                    (float)($nextUnpaidRepayment->interest_component ?? 0);
+                $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) + 
+                                  (float)($nextUnpaidRepayment->interest_component ?? 0);
                 $repaymentDate = $nextUnpaidRepayment->due_date;
 
                 // Keep the earliest date
@@ -394,22 +398,23 @@ class CollectionSheetController extends Controller
                 $memberDueInstances[] = "{$productLabel}: " . number_format($todayDueAmount, 2);
                 $memberDueTotal += $todayDueAmount;
 
-                // Find the next unpaid repayment for this loan (for displaying next due)
-                $nextUnpaidRepayment = $loan->repayments()
+                // Find repayments due on the selected date (not next due, but due on this specific date)
+                $repaymentDueOnDate = $loan->repayments()
+                    ->whereDate('due_date', $dateCarbon->toDateString())
                     ->whereIn('status', ['due', 'partial'])
-                    ->orderBy('due_date', 'asc')
                     ->first();
 
-                // Update next due if we found an unpaid repayment
-                if ($nextUnpaidRepayment) {
+                // If we found a repayment due on the selected date, use it
+                if ($repaymentDueOnDate) {
                     // Calculate total amount (principal + interest)
-                    $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) +
-                        (float)($nextUnpaidRepayment->interest_component ?? 0);
-                    $repaymentDate = $nextUnpaidRepayment->due_date;
+                    $repaymentAmount = (float)($repaymentDueOnDate->principal_component ?? $repaymentDueOnDate->amount ?? 0) + 
+                                      (float)($repaymentDueOnDate->interest_component ?? 0);
+                    $repaymentDate = $repaymentDueOnDate->due_date;
 
-                    // Keep the earliest date across all loans for this member
-                    if (!$nextDueDate || $repaymentDate < $nextDueDate) {
-                        $nextDueAmount = $repaymentAmount;
+                    // Sum up amounts if multiple repayments exist for this date (across loans)
+                    $nextDueAmount += $repaymentAmount;
+                    // Set date (will be same for all repayments on this date)
+                    if (!$nextDueDate) {
                         $nextDueDate = $repaymentDate;
                     }
                 }
@@ -468,6 +473,7 @@ class CollectionSheetController extends Controller
                 'due_total' => round($memberDueTotal, 2),
                 'next_due_amount' => round($nextDueAmount, 2),
                 'next_due_date' => $nextDueDate ? $nextDueDate->format('Y-m-d') : null,
+                'has_due_on_date' => $nextDueAmount > 0, // Flag to check if member has any due on selected date
                 'member_adv' => round($memberAdvSum, 2),
                 'due_disb' => round($dueDisbSum, 2),
                 'spouse_kyc' => $spouseCandidate,
@@ -476,11 +482,13 @@ class CollectionSheetController extends Controller
                 'lp_pa_l' => $lpPalValue,
             ];
 
-            // accumulate summary
-            $summary['due_collections'] += $memberDueTotal;
-            $summary['due_disbursements'] += $dueDisbSum;
-            $summary['other_collections'] += $memberAdvSum + $prSum + $sanchaySum;
-            $summary['other_disbursements'] += 0; // update if you have other disbursement fields
+            // accumulate summary only for members with dues on the selected date
+            if ($nextDueAmount > 0) {
+                $summary['due_collections'] += $nextDueAmount; // Use next_due_amount (due on selected date) instead of memberDueTotal
+                $summary['due_disbursements'] += $dueDisbSum;
+                $summary['other_collections'] += $memberAdvSum + $prSum + $sanchaySum;
+                $summary['other_disbursements'] += 0; // update if you have other disbursement fields
+            }
         }
 
         // finalize summary totals

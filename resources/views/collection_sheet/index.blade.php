@@ -128,6 +128,7 @@
             display: none;
         }
     }
+
     /* Date filter form styling */
     .date-filter-box {
         background: #f8f9fa;
@@ -174,14 +175,13 @@
 <div class="date-filter-box no-print">
     <form method="GET" action="{{ route('collection.sheet', $groupId) }}">
         <label for="date_filter">Select Date:</label>
-        <input 
-            type="date" 
-            id="date_filter" 
-            name="date" 
-            value="{{ $date }}" 
+        <input
+            type="date"
+            id="date_filter"
+            name="date"
+            value="{{ $date }}"
             class="form-control"
-            style="display: inline-block; width: auto;"
-        >
+            style="display: inline-block; width: auto;">
         <button type="submit" class="btn btn-primary btn-sm">
             <i class="bi bi-calendar-check me-1"></i> View Collection Sheet
         </button>
@@ -239,7 +239,15 @@
     </thead>
 
     <tbody>
-        @foreach($rows as $r)
+        @php
+        // Filter rows to show only members with dues on the selected date
+        $filteredRows = collect($rows)->filter(function($r) {
+        return isset($r['has_due_on_date']) && $r['has_due_on_date'] && ($r['next_due_amount'] ?? 0) > 0;
+        });
+        @endphp
+
+        @if($filteredRows->count() > 0)
+        @foreach($filteredRows as $r)
         <tr>
             <td class="mono">{{ $r['member_id'] }}</td>
             <td class="col-member">{{ $r['member_name'] }}</td>
@@ -258,20 +266,16 @@
             <td style="width:8%;">{{ number_format($r['loan_total_balance'],2) }}</td>
 
             <td style="text-align:left; padding-left:6px;">
-                {{-- Display next due amount --}}
-                @if(isset($r['next_due_amount']) && $r['next_due_amount'] > 0)
-                    <span class="inst-line">₹ {{ number_format($r['next_due_amount'], 2) }}</span>
-                @else
-                    <span class="inst-line">-</span>
-                @endif
+                {{-- Display due amount for selected date --}}
+                <span class="inst-line">₹ {{ number_format($r['next_due_amount'], 2) }}</span>
             </td>
 
             <td style="width:8%;">
-                {{-- Display next due date --}}
+                {{-- Display due date for selected date --}}
                 @if(isset($r['next_due_date']) && $r['next_due_date'])
-                    {{ \Carbon\Carbon::parse($r['next_due_date'])->format('d M Y') }}
+                {{ \Carbon\Carbon::parse($r['next_due_date'])->format('d M Y') }}
                 @else
-                    -
+                -
                 @endif
             </td>
 
@@ -287,49 +291,76 @@
             </td>
         </tr>
         @endforeach
+        @else
+        {{-- Show message if no members have dues on selected date --}}
+        <tr>
+            <td colspan="7" style="text-align:center; padding:20px; color: #6c757d; font-style: italic;">
+                @if(\Carbon\Carbon::parse($date)->isToday())
+                No dues for today
+                @else
+                No dues for {{ \Carbon\Carbon::parse($date)->format('d M Y') }}
+                @endif
+            </td>
+        </tr>
+        @endif
 
         {{-- Totals Row --}}
+        @if($filteredRows->count() > 0)
         <tr>
             <td colspan="3" style="text-align:right; font-weight:700;">TOTAL</td>
             <td style="font-weight:700;">
-                {{ number_format(collect($rows)->sum('loan_total_balance'),2) }}
+                {{ number_format($filteredRows->sum('loan_total_balance'),2) }}
             </td>
             <td style="text-align:right; font-weight:700;">TOTAL DUE</td>
             <td style="font-weight:700;">
-                {{ number_format(collect($rows)->sum('next_due_amount'),2) }}
+                {{ number_format($filteredRows->sum('next_due_amount'),2) }}
             </td>
             <td></td>
         </tr>
+        @endif
     </tbody>
 </table>
 
 {{-- summary box --}}
+@php
+// Calculate summary from filtered rows (only members with dues on selected date)
+$filteredSummary = [
+'due_collections' => $filteredRows->sum('next_due_amount'),
+'other_collections' => $filteredRows->sum('member_adv') + $filteredRows->sum('pr') + $filteredRows->sum('sanchay_due'),
+'due_disbursements' => $filteredRows->sum('due_disb'),
+'other_disbursements' => 0,
+];
+$filteredSummary['total_collections'] = $filteredSummary['due_collections'] + $filteredSummary['other_collections'];
+$filteredSummary['total_disbursements'] = $filteredSummary['due_disbursements'] + $filteredSummary['other_disbursements'];
+@endphp
+
+@if($filteredRows->count() > 0)
 <div style="display:flex; gap:20px; margin-top:14px;">
     <div class="summary-box">
         <table style="width:100%; border-collapse:collapse;">
             <tr>
                 <td style="width:60%;">Due Collections</td>
-                <td style="text-align:right;">{{ number_format($summary['due_collections'],2) }}</td>
+                <td style="text-align:right;">{{ number_format($filteredSummary['due_collections'],2) }}</td>
             </tr>
             <tr>
                 <td>Other Collections</td>
-                <td style="text-align:right;">{{ number_format($summary['other_collections'],2) }}</td>
+                <td style="text-align:right;">{{ number_format($filteredSummary['other_collections'],2) }}</td>
             </tr>
             <tr>
                 <td>Total Collections</td>
-                <td style="text-align:right;">{{ number_format($summary['total_collections'],2) }}</td>
+                <td style="text-align:right;">{{ number_format($filteredSummary['total_collections'],2) }}</td>
             </tr>
             <tr>
                 <td>Due Disbursements</td>
-                <td style="text-align:right;">{{ number_format($summary['due_disbursements'],2) }}</td>
+                <td style="text-align:right;">{{ number_format($filteredSummary['due_disbursements'],2) }}</td>
             </tr>
             <tr>
                 <td>Other Disbursements</td>
-                <td style="text-align:right;">{{ number_format($summary['other_disbursements'],2) }}</td>
+                <td style="text-align:right;">{{ number_format($filteredSummary['other_disbursements'],2) }}</td>
             </tr>
             <tr>
                 <td>Total Disbursements</td>
-                <td style="text-align:right;">{{ number_format($summary['total_disbursements'],2) }}</td>
+                <td style="text-align:right;">{{ number_format($filteredSummary['total_disbursements'],2) }}</td>
             </tr>
         </table>
     </div>
@@ -355,6 +386,7 @@
         </table>
     </div>
 </div>
+@endif
 
 <div class="sign-row">
     <div class="sign-item">Branch Leader</div>

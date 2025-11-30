@@ -4,7 +4,7 @@
 <div class="container">
 
     <div class="text-center mb-4">
-        <img src="{{ asset('images/logo.png') }}" height="80">
+        <img src="{{ asset('images/finvels.jpg') }}" height="80">
         <h3 class="mt-2">Daily Cashbook Report</h3>
         <p>Date: <strong>{{ $date }}</strong></p>
     </div>

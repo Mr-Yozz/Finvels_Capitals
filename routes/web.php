@@ -194,8 +194,32 @@ Route::post('/repayment/{id}/pay', [BillingController::class, 'markPaid'])->name
 
 
 Route::get('/groups/{group}/billings', [BillingController::class, 'groupDailyBillings'])->name('group.billings');
-
 Route::post('/repayment/{repayment}/pay', [BillingController::class, 'RepaymentController@pay'])->name('repayment.pay');
+
+use App\Http\Controllers\CashBookController;
+
+// Cashbook
+Route::get('/cashbook', [CashbookController::class, 'index'])->name('cashbook.index');
+Route::post('/cashbook/save', [CashbookController::class, 'storeOrUpdate'])->name('cashbook.save');
+
+
+// Report
+Route::get('/cashbook/report', [CashbookController::class, 'report'])->name('cashbook.report');
+Route::get('/cashbook/report/pdf', [CashbookController::class, 'exportPdf'])->name('cashbook.report.pdf');
+Route::get('/cashbook/report/excel', [CashbookController::class, 'exportExcel'])->name('cashbook.report.excel');
+
+
+// Route::get('/cashbook', [CashBookController::class, 'groups'])->name('cashbook.groups');
+// Route::get('/cashbook', [CashBookController::class, 'index'])
+//     ->name('cashbook.index');
+
+// Route::post('/cashbook/{groupId}/deposit', [CashBookController::class, 'storeOrUpdate'])
+//     ->name('cashbook.store');
+
+// Route::post('/cashbook/{groupId}/expense', [CashBookController::class, 'storeExpense'])
+//     ->name('cashbook.expense.store');
+
+
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

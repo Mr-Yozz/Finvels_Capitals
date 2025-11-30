@@ -61,6 +61,10 @@ class CollectionSheetController extends Controller
             $memberDueInstances = [];
             $memberDueTotal = 0.0;
 
+            // Variables to store next due amount and date (earliest unpaid repayment)
+            $nextDueAmount = 0.0;
+            $nextDueDate = null;
+
             // aggregated per-member fields
             $memberAdvSum = 0.0;
             $dueDisbSum = 0.0;
@@ -109,6 +113,26 @@ class CollectionSheetController extends Controller
                 // always show a line for product/due (0.00 if none)
                 $memberDueInstances[] = "{$productLabel}: " . number_format($todayDueAmount, 2);
                 $memberDueTotal += $todayDueAmount;
+
+                // Find the next unpaid repayment for this loan (for displaying next due)
+                $nextUnpaidRepayment = $loan->repayments()
+                    ->whereIn('status', ['due', 'partial'])
+                    ->orderBy('due_date', 'asc')
+                    ->first();
+
+                // Update next due if we found an unpaid repayment
+                if ($nextUnpaidRepayment) {
+                    // Calculate total amount (principal + interest)
+                    $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) +
+                        (float)($nextUnpaidRepayment->interest_component ?? 0);
+                    $repaymentDate = $nextUnpaidRepayment->due_date;
+
+                    // Keep the earliest date across all loans for this member
+                    if (!$nextDueDate || $repaymentDate < $nextDueDate) {
+                        $nextDueAmount = $repaymentAmount;
+                        $nextDueDate = $repaymentDate;
+                    }
+                }
 
                 // Aggregate per-repayment fields for this date for this loan
                 $repaymentAggregates = $loan->repayments()
@@ -162,6 +186,8 @@ class CollectionSheetController extends Controller
                 'loan_total_balance' => round($memberLoanBalances, 2),
                 'due_instances' => $memberDueInstances,
                 'due_total' => round($memberDueTotal, 2),
+                'next_due_amount' => round($nextDueAmount, 2),
+                'next_due_date' => $nextDueDate ? $nextDueDate->format('Y-m-d') : null,
                 'member_adv' => round($memberAdvSum, 2),
                 'due_disb' => round($dueDisbSum, 2),
                 'spouse_kyc' => $spouseCandidate,
@@ -240,6 +266,39 @@ class CollectionSheetController extends Controller
         ));
     }
 
+    // Helper function to calculate next due amount and date for a member
+    private function calculateNextDue($member, $dateCarbon)
+    {
+        $nextDueAmount = 0.0;
+        $nextDueDate = null;
+
+        foreach ($member->loans as $loan) {
+            // Find the earliest unpaid repayment for this loan
+            $nextUnpaidRepayment = $loan->repayments()
+                ->whereIn('status', ['due', 'partial'])
+                ->orderBy('due_date', 'asc')
+                ->first();
+
+            if ($nextUnpaidRepayment) {
+                // Calculate total amount (principal + interest)
+                $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) +
+                    (float)($nextUnpaidRepayment->interest_component ?? 0);
+                $repaymentDate = $nextUnpaidRepayment->due_date;
+
+                // Keep the earliest date
+                if (!$nextDueDate || $repaymentDate < $nextDueDate) {
+                    $nextDueAmount = $repaymentAmount;
+                    $nextDueDate = $repaymentDate;
+                }
+            }
+        }
+
+        return [
+            'amount' => round($nextDueAmount, 2),
+            'date' => $nextDueDate ? $nextDueDate->format('Y-m-d') : null
+        ];
+    }
+
     private function prepareCollectionData($groupId, $date = null)
     {
         $date = $date ?: Carbon::now()->toDateString();
@@ -281,6 +340,10 @@ class CollectionSheetController extends Controller
 
             $memberDueInstances = [];
             $memberDueTotal = 0.0;
+
+            // Variables to store next due amount and date (earliest unpaid repayment)
+            $nextDueAmount = 0.0;
+            $nextDueDate = null;
 
             // aggregated per-member fields
             $memberAdvSum = 0.0;
@@ -330,6 +393,26 @@ class CollectionSheetController extends Controller
                 // always show a line for product/due (0.00 if none)
                 $memberDueInstances[] = "{$productLabel}: " . number_format($todayDueAmount, 2);
                 $memberDueTotal += $todayDueAmount;
+
+                // Find the next unpaid repayment for this loan (for displaying next due)
+                $nextUnpaidRepayment = $loan->repayments()
+                    ->whereIn('status', ['due', 'partial'])
+                    ->orderBy('due_date', 'asc')
+                    ->first();
+
+                // Update next due if we found an unpaid repayment
+                if ($nextUnpaidRepayment) {
+                    // Calculate total amount (principal + interest)
+                    $repaymentAmount = (float)($nextUnpaidRepayment->principal_component ?? $nextUnpaidRepayment->amount ?? 0) +
+                        (float)($nextUnpaidRepayment->interest_component ?? 0);
+                    $repaymentDate = $nextUnpaidRepayment->due_date;
+
+                    // Keep the earliest date across all loans for this member
+                    if (!$nextDueDate || $repaymentDate < $nextDueDate) {
+                        $nextDueAmount = $repaymentAmount;
+                        $nextDueDate = $repaymentDate;
+                    }
+                }
 
                 // Aggregate per-repayment fields for this date for this loan
                 $repaymentAggregates = $loan->repayments()
@@ -383,6 +466,8 @@ class CollectionSheetController extends Controller
                 'loan_total_balance' => round($memberLoanBalances, 2),
                 'due_instances' => $memberDueInstances,
                 'due_total' => round($memberDueTotal, 2),
+                'next_due_amount' => round($nextDueAmount, 2),
+                'next_due_date' => $nextDueDate ? $nextDueDate->format('Y-m-d') : null,
                 'member_adv' => round($memberAdvSum, 2),
                 'due_disb' => round($dueDisbSum, 2),
                 'spouse_kyc' => $spouseCandidate,

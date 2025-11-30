@@ -30,4 +30,8 @@ class AccountCategoryController extends Controller
         ExpenseCategory::findOrFail($id)->delete();
         return back()->with('success', 'Category deleted!');
     }
+
+    public function Accounts(){
+        
+    }
 }

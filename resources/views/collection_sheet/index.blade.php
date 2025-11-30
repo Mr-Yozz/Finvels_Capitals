@@ -128,6 +128,38 @@
             display: none;
         }
     }
+    /* Date filter form styling */
+    .date-filter-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+    }
+
+    .date-filter-box form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .date-filter-box label {
+        font-weight: 600;
+        color: #495057;
+        margin: 0;
+    }
+
+    .date-filter-box input[type="date"] {
+        padding: 6px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .date-filter-box button {
+        padding: 6px 20px;
+    }
 </style>
 @endsection
 @section('content')
@@ -137,12 +169,34 @@
         Role: {{ $group->branch?->user?->role ?? 'NULL' }}
         Name: {{ $group->branch?->user?->name ?? 'NULL' }}
     </pre> -->
+
+{{-- Date Filter Form --}}
+<div class="date-filter-box no-print">
+    <form method="GET" action="{{ route('collection.sheet', $groupId) }}">
+        <label for="date_filter">Select Date:</label>
+        <input 
+            type="date" 
+            id="date_filter" 
+            name="date" 
+            value="{{ $date }}" 
+            class="form-control"
+            style="display: inline-block; width: auto;"
+        >
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-calendar-check me-1"></i> View Collection Sheet
+        </button>
+        <a href="{{ route('collection.sheet', $groupId) }}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-clockwise me-1"></i> Today
+        </a>
+    </form>
+</div>
+
 <div class="mb-3 d-flex gap-2">
-    <a href="{{ route('collection.export.pdf', $groupId) }}" class="btn btn-danger btn-sm">
+    <a href="{{ route('collection.export.pdf', $groupId) }}?date={{ $date }}" class="btn btn-danger btn-sm">
         <i class="bi bi-file-earmark-pdf-fill me-1"></i> Export PDF
     </a>
 
-    <a href="{{ route('collection.export.excel', $groupId) }}" class="btn btn-success btn-sm">
+    <a href="{{ route('collection.export.excel', $groupId) }}?date={{ $date }}" class="btn btn-success btn-sm">
         <i class="bi bi-file-earmark-excel-fill me-1"></i> Export Excel
     </a>
 </div>
@@ -170,16 +224,17 @@
             <th class="col-loan-balances" colspan="2">LOAN BALANCES</th>
 
             <th class="col-dues" colspan="2">DUES</th>
+            <th class="col-loans-extra" rowspan="2">Signature</th>
 
-            <th class="col-loans-extra" rowspan="2">LOANS<br><span class="small">MEMB ADV | DUE DISB | SPOUSE KYC | PR | SANCHAY PRODUCT DUE | LP/PA/L</span></th>
+            <!-- <th class="col-loans-extra" rowspan="2">LOANS<br><span class="small">MEMB ADV | DUE DISB | SPOUSE KYC | PR | SANCHAY PRODUCT DUE | LP/PA/L</span></th> -->
         </tr>
 
         <tr>
             <th class="small">LOAN INSTANCE</th>
             <th class="small">TOTAL</th>
 
-            <th class="small">LOAN INSTANCE</th>
-            <th class="small">TOTAL</th>
+            <th class="small">Due Amount</th>
+            <th class="small">Due Date</th>
         </tr>
     </thead>
 
@@ -203,26 +258,32 @@
             <td style="width:8%;">{{ number_format($r['loan_total_balance'],2) }}</td>
 
             <td style="text-align:left; padding-left:6px;">
-                @if(count($r['due_instances']))
-                @foreach($r['due_instances'] as $di)
-                <span class="inst-line">{{ $di }}</span>
-                @endforeach
+                {{-- Display next due amount --}}
+                @if(isset($r['next_due_amount']) && $r['next_due_amount'] > 0)
+                    <span class="inst-line">₹ {{ number_format($r['next_due_amount'], 2) }}</span>
                 @else
-                <span class="inst-line">-</span>
+                    <span class="inst-line">-</span>
                 @endif
             </td>
 
-            <td style="width:8%;">{{ number_format($r['due_total'],2) }}</td>
+            <td style="width:8%;">
+                {{-- Display next due date --}}
+                @if(isset($r['next_due_date']) && $r['next_due_date'])
+                    {{ \Carbon\Carbon::parse($r['next_due_date'])->format('d M Y') }}
+                @else
+                    -
+                @endif
+            </td>
 
             <td style="text-align:left; padding-left:6px;">
-                <div class="small">
+                <!-- <div class="small">
                     MEM ADV: {{ number_format($r['member_adv'] ?? 0,2) }}<br>
                     DUE DISB: {{ number_format($r['due_disb'] ?? 0,2) }}<br>
                     SPOUSE: {{ $r['spouse_kyc'] ?: '-' }}<br>
                     PR: {{ $r['pr'] ?? 0 }}<br>
                     SANCHAY: {{ $r['sanchay_due'] ?? 0 }}<br>
                     LP/PA/L: {{ $r['lp_pa_l'] ?? '-' }}
-                </div>
+                </div> -->
             </td>
         </tr>
         @endforeach
@@ -235,7 +296,7 @@
             </td>
             <td style="text-align:right; font-weight:700;">TOTAL DUE</td>
             <td style="font-weight:700;">
-                {{ number_format(collect($rows)->sum('due_total'),2) }}
+                {{ number_format(collect($rows)->sum('next_due_amount'),2) }}
             </td>
             <td></td>
         </tr>

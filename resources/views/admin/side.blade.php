@@ -23,7 +23,7 @@
         </li>
         <!-- <li><a href="repay_entry.php" class="sidebar-link"><i class="fa-solid fa-plus-circle"></i>Apply Repayment</a></li> -->
         <li><a href="{{route('reports.groups')}}" class="sidebar-link"><i class="fa-solid fa-calendar-day"></i>Daily Billing</a></li>
-        <li><a href="{{route('expenses.index')}}" class="sidebar-link"><i class="fa-solid fa-file-invoice-dollar"></i>Accounts / Expenses</a></li>
+        <li><a href="{{route('cashbook.index')}}" class="sidebar-link"><i class="fa-solid fa-file-invoice-dollar"></i>Accounts / Expenses</a></li>
         <li><a href="{{ route('account.categories')}}" class="sidebar-link"><i class="fa-solid fa-list"></i>Expense Categories</a></li>
         <!-- <li><a href="export_loans.php" class="sidebar-link"><i class="fa-solid fa-file-export"></i>Export CSV</a></li> -->
     </ul>

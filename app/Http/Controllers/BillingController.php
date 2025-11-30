@@ -45,13 +45,6 @@ class BillingController extends Controller
         return view('reports.members_billing', compact('repayments', 'date', 'totalDue', 'totalPaid', 'outstanding', 'memberId'));
     }
 
-    // app/Http/Controllers/ReportsController.php
-
-    // use App\Models\Group;
-    // use App\Models\Repayment;
-    // use Illuminate\Http\Request;
-    // use Carbon\Carbon;
-
     public function groupDailyBillings(Group $group, Request $request)
     {
         // The date defaults to today, but can be overridden by a request input 'date'

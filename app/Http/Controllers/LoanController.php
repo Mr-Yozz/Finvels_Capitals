@@ -247,16 +247,11 @@ class LoanController extends Controller
 
     public function show_admin($id)
     {
-        $notifications = [];
-
-        // if (Auth::check()) {
-        //     $notifications = DatabaseNotification::where('notifiable_id', Auth::id())
-        //         ->where('notifiable_type', get_class(Auth::user()))
-        //         ->whereNull('read_at')
-        //         ->latest()
-        //         ->get();
-        // }
         $loanRequest = LoanRequest::findOrFail($id);
+
+        Auth::user()->unreadNotifications
+            ->where('data.loan_id', $loanRequest->id)
+            ->markAsRead();
         return view('admin.loan_request.view', compact('loanRequest'));
     }
 

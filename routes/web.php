@@ -209,18 +209,6 @@ Route::get('/cashbook/report/pdf', [CashbookController::class, 'exportPdf'])->na
 Route::get('/cashbook/report/excel', [CashbookController::class, 'exportExcel'])->name('cashbook.report.excel');
 
 
-// Route::get('/cashbook', [CashBookController::class, 'groups'])->name('cashbook.groups');
-// Route::get('/cashbook', [CashBookController::class, 'index'])
-//     ->name('cashbook.index');
-
-// Route::post('/cashbook/{groupId}/deposit', [CashBookController::class, 'storeOrUpdate'])
-//     ->name('cashbook.store');
-
-// Route::post('/cashbook/{groupId}/expense', [CashBookController::class, 'storeExpense'])
-//     ->name('cashbook.expense.store');
-
-
-
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });

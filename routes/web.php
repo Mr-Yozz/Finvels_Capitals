@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-Route::prefix('branch')->controller(BranchController::class)->group(function () {
+Route::prefix('branch')->middleware(['auth'])->controller(BranchController::class)->group(function () {
 
     Route::get('branches', 'index')->name('branches.index');         // List all branches
     Route::get('branches/create', 'create')->name('branches.create'); // Show create form

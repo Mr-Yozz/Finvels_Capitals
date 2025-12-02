@@ -19,6 +19,16 @@ class Group extends Model
         return $this->hasMany(Member::class);
     }
 
+    public function leader()
+    {
+        return $this->hasOne(Member::class)->where('role', 'leader');
+    }
+
+    public function subLeader()
+    {
+        return $this->hasOne(Member::class)->where('role', 'sub_leader');
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class);

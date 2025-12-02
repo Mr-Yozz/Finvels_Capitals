@@ -63,6 +63,13 @@
             @error('group_id') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
+        <select name="role" class="form-select" required>
+            <option value="">Select Role</option>
+            <option value="leader" {{ old('role') == 'leader' ? 'selected' : '' }}>Leader</option>
+            <option value="sub_leader" {{ old('role') == 'sub_leader' ? 'selected' : '' }}>Sub Leader</option>
+            <option value="member" {{ old('role') == 'member' ? 'selected' : '' }}>Member</option>
+        </select>
+
         <button class="btn btn-primary">Update</button>
         <a href="{{ route('members.index') }}" class="btn btn-secondary">Cancel</a>
     </form>

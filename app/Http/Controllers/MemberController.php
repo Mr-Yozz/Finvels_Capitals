@@ -24,17 +24,29 @@ class MemberController extends Controller
     public function index(Request $request)
     {
         $group_id = $request->query('group_id');
+        $role     = $request->query('role'); // NEW
 
         $query = Member::with(['user', 'group']);
 
+        // Filter by group
         if ($group_id) {
             $query->where('group_id', $group_id);
         }
 
+        // Filter by role
+        if ($role) {
+            $query->where('role', $role);
+        }
+
+        // Default sorting: leader → sub leader → member → others
+        $query->orderByRaw("FIELD(role, 'leader', 'sub_leader', 'member') ASC")
+            ->orderBy('name', 'asc');
+
         $members = $query->paginate(15)->withQueryString();
 
-        return view('members.index', compact('members', 'group_id'));
+        return view('members.index', compact('members', 'group_id', 'role'));
     }
+
 
     public function create(Request $request)
     {
@@ -69,6 +81,7 @@ class MemberController extends Controller
             'branch_name' => 'nullable|string',
             'ifsc_code' => 'required|string|max:50',
             'group_id' => 'required|exists:groups,id',
+            'role' => 'required|in:leader,sub_leader,member',
         ]);
 
         // Add missing column (user_id) if your Member table has user_id
@@ -94,6 +107,8 @@ class MemberController extends Controller
             'branch_id' => 'required|exists:branches,id',
             'ifsc_code' => 'required|string|max:50',
             'group_id' => 'required|exists:groups,id',
+            'role' => 'required|in:leader,sub_leader,member',
+
         ]);
 
         // Generate OTP
@@ -149,6 +164,7 @@ class MemberController extends Controller
                 'branch_id'         => $data['branch_id'],
                 'ifsc_code'         => $data['ifsc_code'],
                 'group_id'          => $data['group_id'],
+                'role'              => $data['role'],
                 'user_id'           => $user->id,   // LINK HERE
             ]);
 
@@ -226,6 +242,7 @@ class MemberController extends Controller
             'branch_name' => 'nullable|string',
             'ifsc_code' => 'required|string|max:50',
             'group_id' => 'required|exists:groups,id',
+            'role' => 'required|in:leader,sub_leader,member',
         ]);
 
         $member->update($request->all());
@@ -237,7 +254,7 @@ class MemberController extends Controller
             ]);
         }
 
-        return redirect()->route('members.index')->with('success', 'Member updated successfully!');
+        return back()->with('success', 'Member updated successfully!');
     }
 
     /**
@@ -246,7 +263,7 @@ class MemberController extends Controller
     public function destroy(Member $member)
     {
         $member->delete();
-        return redirect()->route('members.index')->with('success', 'Member deleted successfully!');
+        return back()->with('success', 'Member deleted successfully!');
     }
 
     // PDF Export

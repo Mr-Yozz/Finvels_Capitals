@@ -85,7 +85,7 @@
         </a>
     </div>
 
-    
+
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
@@ -107,10 +107,40 @@
                 </thead>
                 <tbody>
                     @forelse($members as $member)
+                    @php
+                    // Normalize name for checking
+                    $lowerName = strtolower($member->name);
+
+                    // Determine role for display (fallback to name detection)
+                    if ($member->role == 'leader' || str_contains($lowerName, 'leader')) {
+                    $roleDisplay = 'leader';
+                    } elseif ($member->role == 'sub_leader' || str_contains($lowerName, 'sub')) {
+                    $roleDisplay = 'sub_leader';
+                    } else {
+                    $roleDisplay = 'member';
+                    }
+                    @endphp
                     <tr>
                         <!-- <td>{{ $loop->iteration }}</td> -->
                         <td>{{ $member->member_id }}</td>
-                        <td class="fw-semibold">{{ $member->name }}</td>
+                        <!-- <td class="fw-semibold">{{ $member->name }}</td> -->
+                        <td class="fw-semibold">
+                            @if($roleDisplay === 'leader')
+                            <span style="font-size:20px; font-weight:bold; color:#0056D2;">
+                                {{ $member->name }}
+                            </span>
+
+                            @elseif($roleDisplay === 'sub_leader')
+                            <span style="font-size:17px; font-weight:600; color:#4A90E2;">
+                                {{ $member->name }}
+                            </span>
+
+                            @else
+                            <span style="font-size:15px; color:#000;">
+                                {{ $member->name }}
+                            </span>
+                            @endif
+                        </td>
                         <td>{{ $member->mobile }}</td>
                         <td>{{ $member->aadhaar_encrypted }}</td>
                         <td>{{ $member->pan_encrypted }}</td>

@@ -77,6 +77,13 @@
                 @endforeach
             </select>
 
+            <select name="role" class="form-select" required>
+                <option value="">Select Role</option>
+                <option value="leader" {{ old('role') == 'leader' ? 'selected' : '' }}>Leader</option>
+                <option value="sub_leader" {{ old('role') == 'sub_leader' ? 'selected' : '' }}>Sub Leader</option>
+                <option value="member" {{ old('role') == 'member' ? 'selected' : '' }}>Member</option>
+            </select>
+
 
             <button class="btn btn-success w-100">Create Member</button>
         </form>

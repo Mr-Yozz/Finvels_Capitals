@@ -9,6 +9,12 @@
         <p>Date: <strong>{{ $date }}</strong></p>
     </div>
 
+    <!-- <div class="text-center mb-4">
+        <img src="{{ asset('images/fin.jpeg') }}" height="80">
+        <h3 class="mt-2">Daily Cashbook Report</h3>
+        <p>Date: <strong>{{ $date }}</strong></p>
+    </div> -->
+
     <table class="table table-bordered">
         <tr>
             <th>Opening Balance</th>
@@ -42,7 +48,14 @@
             </tr>
         </thead>
         <tbody>
+            @php
+            $totalPrincipal = 0;
+            @endphp
+
             @forelse($loans as $loan)
+            @php
+            $totalPrincipal += $loan->principal;
+            @endphp
             <tr>
                 <td>{{ $loan->id }}</td>
                 <td>{{ $loan->member->name }}</td>
@@ -54,7 +67,17 @@
             </tr>
             @endforelse
         </tbody>
+
+        @if($loans->count() > 0)
+        <tfoot>
+            <tr>
+                <th colspan="2" class="text-end">Total Principal</th>
+                <th>{{ number_format($totalPrincipal, 2) }}</th>
+            </tr>
+        </tfoot>
+        @endif
     </table>
+
 
     <h4 class="mt-5">Denomination Table</h4>
     <table class="table table-bordered">

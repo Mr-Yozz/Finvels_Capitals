@@ -131,7 +131,14 @@ class CashbookController extends Controller
             $logo = base64_encode(file_get_contents($logoPath));
         }
 
-        $pdf = PDF::loadView('exports.cashbook_pdf', compact('cashbook', 'loans', 'date', 'logo'))
+        $LogoPath = public_path('images/finvel.png');
+        
+        $Logo = null;
+        if (file_exists($LogoPath)) {
+            $Logo = base64_encode(file_get_contents($LogoPath));
+        }
+
+        $pdf = PDF::loadView('exports.cashbook_pdf', compact('cashbook', 'loans', 'date', 'logo', 'Logo'))
             ->setPaper('A4', 'portrait');
 
         return $pdf->download("Cashbook-{$date}.pdf");

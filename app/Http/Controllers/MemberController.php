@@ -270,15 +270,14 @@ class MemberController extends Controller
     public function exportPdf()
     {
         $members = Member::with(['group.branch'])->get();
-        // Logo path
-        $logoPath = public_path('images/finvels.jpeg');
 
-        // Convert logo to Base64
-        $logo = null;
-        if (file_exists($logoPath)) {
-            $logo = base64_encode(file_get_contents($logoPath));
-        }
-        $pdf = Pdf::loadView('exports.members_pdf', compact('members', 'logo'));
+        $logoFile = public_path('images/finvels.png');
+        $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
+
+        $LogoFile = public_path('images/fin.jpeg');
+        $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
+
+        $pdf = Pdf::loadView('exports.members_pdf', compact('members', 'logoBase64', 'LogoBase64'));
         return $pdf->download('members_report.pdf');
     }
 

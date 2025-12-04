@@ -267,16 +267,13 @@ class RepaymentController extends Controller
         // Fetch all repayments with loan & member relation
         $repayments = Repayment::with('loan.member')->latest()->get();
 
-        // Logo path
-        $logoPath = public_path('images/finvels.jpeg');
+        $logoFile = public_path('images/finvels.png');
+        $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
 
-        // Convert logo to Base64
-        $logo = null;
-        if (file_exists($logoPath)) {
-            $logo = base64_encode(file_get_contents($logoPath));
-        }
+        $LogoFile = public_path('images/fin.jpeg');
+        $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
         // Load PDF view
-        $pdf = Pdf::loadView('exports.repayments_pdf', compact('repayments','logo'));
+        $pdf = Pdf::loadView('exports.repayments_pdf', compact('repayments', 'logoBase64', 'LogoBase64'));
 
         return $pdf->download('repayments_report.pdf');
     }

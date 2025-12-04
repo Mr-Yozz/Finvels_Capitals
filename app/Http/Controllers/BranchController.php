@@ -136,17 +136,14 @@ class BranchController extends Controller
     {
         $branches = Branch::withCount(['groups', 'loans', 'users'])->get();
 
-        // Logo path
-        $logoPath = public_path('images/finvels.jpeg');
+        $logoFile = public_path('images/finvels.png');
+        $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
 
-        // Convert logo to Base64
-        $logo = null;
-        if (file_exists($logoPath)) {
-            $logo = base64_encode(file_get_contents($logoPath));
-        }
+        $LogoFile = public_path('images/fin.jpeg');
+        $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
 
         // Return PDF
-        $pdf = Pdf::loadView('exports.branches_pdf', compact('branches', 'logo'));
+        $pdf = Pdf::loadView('exports.branches_pdf', compact('branches', 'logoBase64', 'LogoBase64'));
         return $pdf->download('branches_report.pdf');
     }
 

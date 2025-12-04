@@ -389,8 +389,8 @@ $filteredSummary['total_disbursements'] = $filteredSummary['due_disbursements'] 
 @endif
 
 <div class="sign-row">
-    <div class="sign-item">Member Leader</div>
-    <div class="sign-item">Branch</div>
+    <div class="sign-item">Group Leader</div>
+    <div class="sign-item">MRA manager</div>
     <div class="sign-item">Cashier</div>
 </div>
 

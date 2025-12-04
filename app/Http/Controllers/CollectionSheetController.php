@@ -546,40 +546,91 @@ class CollectionSheetController extends Controller
         return compact('group', 'date', 'rows', 'summary', 'sheetImagePath', 'manager', 'groupId');
     }
 
+    // public function exportPdf(Request $request, $groupId)
+    // {
+    //     $date = $request->query('date', now()->toDateString());
+
+    //     // Reuse your data
+    //     $viewData = $this->prepareCollectionData($groupId, $date);
+
+    //     // Filter rows here (so blade does NOT calculate)
+    //     $filteredRows = collect($viewData['rows'])->filter(function ($r) {
+    //         return isset($r['has_due_on_date']) &&
+    //             $r['has_due_on_date'] &&
+    //             ($r['next_due_amount'] ?? 0) > 0;
+    //     });
+
+    //     // Add logo path
+    //     $logoFile = public_path('images/finvels.png');
+    //     $logoBase64 = file_exists($logoFile)
+    //         ? base64_encode(file_get_contents($logoFile))
+    //         : null;
+
+    //     // Add back into array
+    //     $data = array_merge($viewData, [
+    //         'filteredRows'     => $filteredRows,
+    //         'logoBase64'   => $logoBase64,
+    //         'date'             => $date
+    //     ]);
+
+    //     $pdf = PDF::loadView('collection_sheet.pdf', $data)
+    //         ->setPaper('a4', 'landscape');
+
+    //     $fileName = "Collection_Sheet_{$viewData['group']->name}_{$date}.pdf";
+
+    //     return $pdf->download($fileName);
+    // }
+
     public function exportPdf(Request $request, $groupId)
     {
         $date = $request->query('date', now()->toDateString());
 
-        // Reuse your data
+        // Reuse your data (prepareCollectionData returns 'group', 'date', 'rows', 'summary', etc.)
         $viewData = $this->prepareCollectionData($groupId, $date);
 
-        // Filter rows here (so blade does NOT calculate)
+        // Filter rows (keep as Collection, but convert to plain array for the view/pdf)
         $filteredRows = collect($viewData['rows'])->filter(function ($r) {
-            return isset($r['has_due_on_date']) &&
-                $r['has_due_on_date'] &&
-                ($r['next_due_amount'] ?? 0) > 0;
-        });
+            return !empty($r['has_due_on_date']) && ($r['next_due_amount'] ?? 0) > 0;
+        })->values()->all(); // ->values() to reindex, ->all() to convert to array
 
-        // Add logo path
+        // Ensure summary is present and cast numeric values properly (optional safety)
+        $summary = $viewData['summary'] ?? [];
+        $summary = array_map(function ($v) {
+            if (is_numeric($v)) return round((float)$v, 2);
+            return $v;
+        }, $summary);
+
+        // Add logo path (base64) for embedding in pdf
         $logoFile = public_path('images/finvels.png');
-        $logoBase64 = file_exists($logoFile)
-            ? base64_encode(file_get_contents($logoFile))
-            : null;
+        $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
 
-        // Add back into array
-        $data = array_merge($viewData, [
-            'filteredRows'     => $filteredRows,
-            'logoBase64'   => $logoBase64,
-            'date'             => $date
-        ]);
+        $LogoFile = public_path('images/fin.jpeg');
+        $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
+
+        // Final data passed to the view (all plain arrays / scalars)
+        $data = [
+            'group'         => $viewData['group'],
+            'manager'       => $viewData['manager'] ?? null,
+            'groupId'       => $viewData['groupId'] ?? $groupId,
+            'date'          => $date,
+            'rows'          => $viewData['rows'],         // if your blade expects all rows
+            'filteredRows'  => $filteredRows,            // rows that have dues on date (array)
+            'summary'       => $summary,                 // numeric values rounded
+            'sheetImagePath' => $viewData['sheetImagePath'] ?? null,
+            'logoBase64'    => $logoBase64,
+            'LogoBase64'    => $LogoBase64,
+        ];
 
         $pdf = PDF::loadView('collection_sheet.pdf', $data)
-            ->setPaper('a4', 'landscape');
+            ->setPaper('a4', 'portrait');
 
-        $fileName = "Collection_Sheet_{$viewData['group']->name}_{$date}.pdf";
+        // sanitize filename
+        $groupNameSafe = preg_replace('/[^A-Za-z0-9_\-]/', '_', $viewData['group']->name ?? 'group');
+        $fileName = "Collection_Sheet_{$groupNameSafe}_{$date}.pdf";
 
         return $pdf->download($fileName);
     }
+
 
 
 

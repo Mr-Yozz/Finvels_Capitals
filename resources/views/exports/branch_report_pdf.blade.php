@@ -33,6 +33,38 @@
 </head>
 
 <body>
+    <div class="header">
+        <div style="width:100%; position:relative; margin-bottom:20px;">
+
+            {{-- Left Corner Logo --}}
+            @if(!empty($logoBase64))
+            <img src="data:image/png;base64,{{ $logoBase64 }}"
+                style="height:80px; position:absolute; left:0; top:0; border: radius 50%;">
+            @endif
+
+            {{-- Right Corner Logo --}}
+            @if(!empty($LogoBase64))
+            <img src="data:image/png;base64,{{ $LogoBase64 }}"
+                style="height:80px; position:absolute; right:0; top:0; border: radius 50%;">
+            @endif
+
+            <!-- {{-- Center Heading --}}
+            <div style="text-align:center;">
+                <h2 style="margin:0;">FinVels Loans</h2>
+                <h3 style="margin:0;">COLLECTION SHEET</h3>
+            </div> -->
+
+        </div>
+
+        <div style="margin-top:6px; font-size:12px;">
+            {{ $group->branch->name ?? 'Branch' }} |
+            <strong>{{ $group->name ?? '' }}</strong> |
+            Date: <strong>{{ $date }}</strong> |
+            Manager:
+            {{-- safe manager name lookup: 'manager' variable from controller preferred, then relation --}}
+            {{ $manager->name ?? $group->branch->manager->name ?? 'Not Assigned' ?? 'Not Assigned' }}
+        </div>
+    </div>
     <h3>Branch Reports</h3>
 
     <table>

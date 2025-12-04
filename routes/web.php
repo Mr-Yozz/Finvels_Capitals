@@ -125,8 +125,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('loan-requests/{id}/reject', [LoanController::class, 'reject'])->name('loan-requests.reject');
 });
 
-
-
 Route::resource('repayments', RepaymentController::class);
 Route::get('/reports/daily', [RepaymentController::class, 'dailyReport'])->name('reports.daily');
 Route::get('/reports/branch', [RepaymentController::class, 'branchReport'])->name('reports.branch');

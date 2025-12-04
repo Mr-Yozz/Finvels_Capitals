@@ -231,16 +231,13 @@ class LoanController extends Controller
     {
         $loans = Loan::with(['member', 'branch'])->get();
 
-        // Logo path
-        $logoPath = public_path('images/finvels.jpeg');
+        $logoFile = public_path('images/finvels.png');
+        $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
 
-        // Convert to Base64
-        $logo = null;
-        if (file_exists($logoPath)) {
-            $logo = base64_encode(file_get_contents($logoPath));
-        }
+        $LogoFile = public_path('images/fin.jpeg');
+        $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
 
-        $pdf = Pdf::loadView('exports.loans_pdf', compact('loans', 'logo'));
+        $pdf = Pdf::loadView('exports.loans_pdf', compact('loans', 'logoBase64', 'LogoBase64'));
 
         return $pdf->download('loans_report.pdf');
     }
@@ -258,16 +255,13 @@ class LoanController extends Controller
     {
         $invoice = Invoice::with(['loan.member', 'lines'])->findOrFail($id);
 
-        // Absolute path to the logo
-        $logoPath = public_path('images/finvels.jpeg');
+        $logoFile = public_path('images/finvels.png');
+        $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
 
-        // Convert image → Base64
-        $logo = null;
-        if (file_exists($logoPath)) {
-            $logo = base64_encode(file_get_contents($logoPath));
-        }
+        $LogoFile = public_path('images/fin.jpeg');
+        $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
 
-        $pdf = Pdf::loadView('exports.invoice_pdf', compact('invoice', 'logo'));
+        $pdf = Pdf::loadView('exports.invoice_pdf', compact('invoice', 'logoBase64', 'LogoBase64'));
         return $pdf->download('invoice_' . $invoice->invoice_no . '.pdf');
     }
 

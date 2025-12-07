@@ -129,9 +129,11 @@
         <a href="{{ route('repayments.export.excel') }}" class="btn btn-success btn-sm">
             <i class="bi bi-file-earmark-excel-fill me-1"></i> Export Excel
         </a>
-        <a href="{{ route('repayments.export.pdf') }}" class="btn btn-danger btn-sm">
+        <a href="{{ route('repayments.export.pdf', ['member_id' => $member->id]) }}"
+            class="btn btn-danger btn-sm">
             <i class="bi bi-file-earmark-pdf-fill me-1"></i> Export PDF
         </a>
+
     </div>
 
     <div class="mb-3 d-flex gap-2">

@@ -262,21 +262,54 @@ class RepaymentController extends Controller
         return view('reports.branch', ['reportData' => $reportData]);
     }
 
-    public function exportPdfRepayments()
-    {
-        // Fetch all repayments with loan & member relation
-        $repayments = Repayment::with('loan.member')->latest()->get();
+    // public function exportPdfRepayments()
+    // {
+    //     // Fetch all repayments with loan & member relation
+    //     $repayments = Repayment::with('loan.member')->latest()->get();
 
+    //     $logoFile = public_path('images/finvels.png');
+    //     $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
+
+    //     $LogoFile = public_path('images/fin.jpeg');
+    //     $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
+    //     // Load PDF view
+    //     $pdf = Pdf::loadView('exports.repayments_pdf', compact('repayments', 'logoBase64', 'LogoBase64'));
+
+    //     return $pdf->download('repayments_report.pdf');
+    // }
+
+    public function exportPdfRepayments(Request $request)
+    {
+        // member_id coming from request
+        $memberId = $request->member_id;
+        // dd($memberId);
+        if (!$memberId) {
+            return back()->with('error', 'Member ID is required.');
+        }
+
+        // Filter repayments only for this member
+        $repayments = Repayment::with('loan.member')
+            ->whereHas('loan', function ($q) use ($memberId) {
+                $q->where('member_id', $memberId);
+            })
+            ->orderByDesc('id')
+            ->get();
+
+        // Left Logo
         $logoFile = public_path('images/finvels.png');
         $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
 
+        // Right Logo
         $LogoFile = public_path('images/fin.jpeg');
         $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
-        // Load PDF view
+
+        // Load Blade PDF
         $pdf = Pdf::loadView('exports.repayments_pdf', compact('repayments', 'logoBase64', 'LogoBase64'));
 
-        return $pdf->download('repayments_report.pdf');
+        // Export filename including member ID
+        return $pdf->download("repayments_member_{$memberId}.pdf");
     }
+
 
     public function exportExcelRepayments()
     {

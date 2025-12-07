@@ -128,7 +128,10 @@ Route::middleware(['auth'])->group(function () {
 Route::resource('repayments', RepaymentController::class);
 Route::get('/reports/daily', [RepaymentController::class, 'dailyReport'])->name('reports.daily');
 Route::get('/reports/branch', [RepaymentController::class, 'branchReport'])->name('reports.branch');
-Route::get('repayments/export/pdf', [RepaymentController::class, 'exportPdfRepayments'])->name('repayments.export.pdf');
+// Route::get('repayments/export/pdf', [RepaymentController::class, 'exportPdfRepayments'])->name('repayments.export.pdf');
+Route::get('/export-repayments/{memberId?}', [RepaymentController::class, 'exportPdfRepayments'])
+    ->name('repayments.export.pdf');
+
 Route::get('repayments/export/excel', [RepaymentController::class, 'exportExcelRepayments'])->name('repayments.export.excel');
 Route::get('reports/daily/export/excel', [RepaymentController::class, 'exportExcelDailyReport'])->name('reports.daily.export.excel');
 Route::get('reports/daily/export/pdf', [RepaymentController::class, 'exportPdfDailyReport'])->name('reports.daily.export.pdf');

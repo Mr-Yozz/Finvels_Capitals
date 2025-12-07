@@ -163,7 +163,7 @@
     </table> --}} -->
     @if($loan->invoice)
     <a href="{{ route('invoice.pdf', $loan->invoice->id) }}" class="btn btn-danger">
-        Download PDF
+       Invoice Download PDF 
     </a>
 
     <a href="{{ route('invoice.excel', $loan->invoice->id) }}" class="btn btn-success">

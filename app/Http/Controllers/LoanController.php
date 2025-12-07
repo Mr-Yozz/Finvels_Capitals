@@ -251,9 +251,37 @@ class LoanController extends Controller
     }
 
 
+    // public function exportPdf_in($id)
+    // {
+    //     $invoice = Invoice::with(['loan.member', 'lines'])->findOrFail($id);
+
+    //     $lines = $invoice->lines;
+
+    //     $half = ceil(count($lines) / 2);
+
+    //     $left_rows  = $lines->slice(0, $half);
+    //     $right_rows = $lines->slice($half);
+
+    //     $logoFile = public_path('images/finvels.png');
+    //     $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
+
+    //     $LogoFile = public_path('images/fin.jpeg');
+    //     $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
+
+    //     $pdf = Pdf::loadView('exports.invoice_pdf', compact('invoice', 'left_rows', 'right_rows ', 'logoBase64', 'LogoBase64'));
+    //     return $pdf->download('invoice_' . $invoice->invoice_no . '.pdf');
+    // }
+
     public function exportPdf_in($id)
     {
         $invoice = Invoice::with(['loan.member', 'lines'])->findOrFail($id);
+
+        // $lines = $invoice->lines;
+
+        // $half = ceil(count($lines) / 2);
+
+        // $left_rows  = $lines->slice(0, $half);
+        // $right_rows = $lines->slice($half);
 
         $logoFile = public_path('images/finvels.png');
         $logoBase64 = file_exists($logoFile) ? base64_encode(file_get_contents($logoFile)) : null;
@@ -261,9 +289,17 @@ class LoanController extends Controller
         $LogoFile = public_path('images/fin.jpeg');
         $LogoBase64 = file_exists($LogoFile) ? base64_encode(file_get_contents($LogoFile)) : null;
 
-        $pdf = Pdf::loadView('exports.invoice_pdf', compact('invoice', 'logoBase64', 'LogoBase64'));
+        $pdf = Pdf::loadView('exports.invoice_pdf', compact(
+            'invoice',
+            // 'left_rows',
+            // 'right_rows',
+            'logoBase64',
+            'LogoBase64'
+        ));
+
         return $pdf->download('invoice_' . $invoice->invoice_no . '.pdf');
     }
+
 
 
     public function exportExcel_in($id)
@@ -327,7 +363,6 @@ class LoanController extends Controller
             ->route('loan-requests.show', $loanRequest->id)
             ->with('success', 'Loan approved and created successfully with repayment schedule and invoice.');
     }
-
 
     public function reject($id)
     {

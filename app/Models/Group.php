@@ -9,7 +9,7 @@ use App\Models\Member;
 class Group extends Model
 {
     //
-    protected $fillable = ['branch_id', 'name'];
+    protected $fillable = ['branch_id', 'name', 'day'];
     public function branch()
     {
         return $this->belongsTo(Branch::class);

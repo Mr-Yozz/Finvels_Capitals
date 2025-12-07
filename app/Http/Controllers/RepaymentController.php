@@ -86,7 +86,7 @@ class RepaymentController extends Controller
         }
 
         // CASE 3: If a specific group is selected — show all members under that group
-        if ($request->has('group_id')) {
+        if ($request->has('group_id') && !$request->filled('day') && !$request->has('filter_mode')) {
             $group = \App\Models\Group::with(['members.loans.repayments'])->findOrFail($request->group_id);
 
             $repayments = collect();
@@ -119,7 +119,7 @@ class RepaymentController extends Controller
             return view('repayments.group_members', compact('group', 'members'));
         }
 
-        // CASE: Search by member name
+        // CASE 4: Search by member name
         if ($request->has('member_name') && $request->member_name != '') {
             $members = \App\Models\Member::where('name', 'LIKE', '%' . $request->member_name . '%')
                 ->withCount('loans')
@@ -129,10 +129,37 @@ class RepaymentController extends Controller
         }
 
 
-        // CASE 4: Default — show all groups first
-        $groups = \App\Models\Group::orderBy('name', 'asc')->paginate(12);
+        // CASE 5: Default — show all groups first
+        // $groups = \App\Models\Group::orderBy('name', 'asc')->paginate(12);
+        $allGroups = \App\Models\Group::with('members')->get(); // ✅ For dropdown ONLY
 
-        return view('repayments.groups', compact('groups'));
+        $groups = \App\Models\Group::query();
+
+        if ($request->filled('group_id')) {
+            $groups->where('id', $request->group_id);
+        }
+
+        if ($request->filled('day')) {
+            $groups->where('day', $request->day);
+        }
+
+        $groups = $groups->with('members')
+            ->paginate(12)
+            ->withQueryString(); // ✅ Keep filter during pagination
+
+        return view('repayments.groups', [
+            'groups' => $groups,        // ✅ FILTERED CARDS
+            'allGroups' => $allGroups, // ✅ ALWAYS FULL DROPDOWN
+            'days' => [
+                'monday' => 'Monday',
+                'tuesday' => 'Tuesday',
+                'wednesday' => 'Wednesday',
+                'thursday' => 'Thursday',
+                'friday' => 'Friday',
+                'saturday' => 'Saturday',
+            ],
+            'selectedDay' => $request->day,
+        ]);
     }
 
 

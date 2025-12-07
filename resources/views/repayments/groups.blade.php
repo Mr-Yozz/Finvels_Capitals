@@ -11,7 +11,8 @@
     <h2 class="text-primary fw-bold mb-0">Groups</h2>
 
 
-    <form class="mb-3">
+    <form method="GET" action="{{ url()->current() }}" class="mb-3">
+        <input type="hidden" name="filter_mode" value="1">
         <div class="row g-2 align-items-end">
 
             <!-- Group Filter -->
@@ -19,17 +20,26 @@
                 <label class="form-label">Select Group</label>
                 <select id="groupSelect" name="group_id" class="form-select">
                     <option value="">-- All Groups --</option>
-                    @foreach($groups as $grp)
-                    <option value="{{ $grp->id }}">{{ $grp->name }}</option>
+                    @foreach($allGroups as $grp)
+                    <option value="{{ $grp->id }}" {{ request('group_id') == $grp->id ? 'selected' : '' }}>
+                        {{ $grp->name }}
+                    </option>
                     @endforeach
                 </select>
             </div>
 
-            <!-- Member Filter (Dynamic) -->
             <div class="col-md-3">
-                <label class="form-label">Select Member</label>
-                <select id="memberSelect" name="member_id" class="form-select" disabled>
-                    <option value="">-- Select Member --</option>
+                <label for="daySelect" class="form-label">Select Day</label>
+                <select id="daySelect" name="day" class="form-select">
+                    <option value="">-- Select Day --</option>
+                    {{-- Iterate over the $days array passed from the controller --}}
+                    @foreach($days as $dayValue => $dayName)
+                    <option value="{{ $dayValue }}"
+                        {{-- Retain selection on page reload/validation fail --}}
+                        {{ (old('day', $selectedDay ?? '') == $dayValue) ? 'selected' : '' }}>
+                        {{ $dayName }}
+                    </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -52,6 +62,9 @@
                         <h5 class="card-title text-primary fw-semibold">
                             <i class="bi bi-people"></i> {{ $group->name }}
                         </h5>
+                        <h6 class="card-title text-primary fw-semibold">
+                            <i class="bi bi-people"></i> {{ $group->day }}
+                        </h6>
                         <p class="mb-0 text-muted">Members: {{ $group->members->count() }}</p>
                     </div>
                 </div>
@@ -82,35 +95,16 @@
 </style>
 @endsection
 
+
 @section('scripts')
+
 <script>
-    document.getElementById('groupSelect').addEventListener('change', function() {
-        let groupId = this.value;
-        let memberSelect = document.getElementById('memberSelect');
+    const groupSelect = document.getElementById('groupSelect');
+    const daySelect = document.getElementById('daySelect');
+    const form = groupSelect.closest('form');
 
-        memberSelect.innerHTML = '<option value="">Loading...</option>';
-        memberSelect.disabled = true;
-
-        if (!groupId) {
-            memberSelect.innerHTML = '<option value="">-- Select Member --</option>';
-            return;
-        }
-
-        fetch(`/group-members?group_id=${groupId}`)
-            .then(res => res.json())
-            .then(data => {
-                memberSelect.innerHTML = '<option value="">-- Select Member --</option>';
-
-                data.forEach(member => {
-                    let opt = document.createElement('option');
-                    opt.value = member.id;
-                    opt.textContent = `${member.name} (${member.member_id})`;
-                    memberSelect.appendChild(opt);
-                });
-
-                memberSelect.disabled = false;
-            });
-    });
+    groupSelect.addEventListener('change', () => form.submit());
+    daySelect.addEventListener('change', () => form.submit());
 </script>
 
 @endsection

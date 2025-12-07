@@ -39,7 +39,19 @@ class GroupController extends Controller
         //
         $branches = Branch::all();
         $selectedBranchId = $request->query('branch_id');
-        return view('groups.create', compact('branches', 'selectedBranchId'));
+
+
+        $days = [
+            'Monday'    => 'Monday',
+            'Tuesday'   => 'Tuesday',
+            'Wednesday' => 'Wednesday',
+            'Thursday'  => 'Thursday',
+            'Friday'    => 'Friday',
+            'Saturday'  => 'Saturday',
+            'Sunday'    => 'Sunday',
+        ];
+
+        return view('groups.create', compact('branches', 'selectedBranchId', 'days'));
     }
 
     /**
@@ -51,7 +63,10 @@ class GroupController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:groups,name',
             'branch_id' => 'required|exists:branches,id',
+            'day' => 'nullable|max:20',
         ]);
+
+        // dd($request);
 
         Group::create($request->all());
         return redirect()->route('groups.index')->with('success', 'Group created successfully!');
@@ -74,7 +89,16 @@ class GroupController extends Controller
     {
         //
         $branches = Branch::all();
-        return view('groups.edit', compact('group', 'branches'));
+        $days = [
+            'Monday'    => 'Monday',
+            'Tuesday'   => 'Tuesday',
+            'Wednesday' => 'Wednesday',
+            'Thursday'  => 'Thursday',
+            'Friday'    => 'Friday',
+            'Saturday'  => 'Saturday',
+            'Sunday'    => 'Sunday',
+        ];
+        return view('groups.edit', compact('group', 'branches', 'days'));
     }
 
     /**
@@ -86,7 +110,10 @@ class GroupController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:groups,name,' . $group->id,
             'branch_id' => 'required|exists:branches,id',
+            'day' => 'nullable|max:20',
         ]);
+
+        // dd($request);
 
         $group->update($request->all());
         return redirect()->route('groups.index')->with('success', 'Group updated successfully!');

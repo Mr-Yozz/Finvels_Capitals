@@ -102,6 +102,7 @@
                     <th>#</th>
                     <th>Group Name</th>
                     <th>Branch</th>
+                    <th>Day</th>
                     <th class="text-center">Actions</th>
                 </tr>
             </thead>
@@ -111,7 +112,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $group->name }}</td>
                     <td>{{ $group->branch->name ?? '-' }}</td>
-
+                    <td>{{ $group->day }}</td>
                     <td class="text-center text-nowrap">
                         <div class="d-flex justify-content-between align-items-center">
 

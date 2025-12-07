@@ -31,6 +31,18 @@
         @enderror
     </div>
 
+    <div class="mb-3">
+        <select name="day" class="form-select" required>
+            <option value="">Select Day</option>
+            @foreach($days as $dayValue => $dayName)
+            <option value="{{ $dayValue }}"
+                {{ (old('day', $selectedDay ?? '') == $dayValue) ? 'selected' : '' }}>
+                {{ $dayName }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+
     <button class="btn btn-primary">Update</button>
     <a href="{{ route('groups.index') }}" class="btn btn-secondary">Cancel</a>
 </form>

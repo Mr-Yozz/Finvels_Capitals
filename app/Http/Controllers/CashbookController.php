@@ -108,7 +108,7 @@ class CashbookController extends Controller
 
         // Today's loan disbursements
         $loans = Loan::with('member')
-            ->whereDate('disbursed_at', $date)
+            ->whereDate('created_at', $date)
             ->get();
 
         return view('cashbook.report', compact('cashbook', 'loans', 'date'));
@@ -120,7 +120,7 @@ class CashbookController extends Controller
 
         $cashbook = Cashbook::whereDate('date', $date)->first();
         $loans = Loan::with('member')
-            ->whereDate('disbursed_at', $date)
+            ->whereDate('created_at', $date)
             ->get();
 
         $logoFile = public_path('images/finvels.png');

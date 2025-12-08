@@ -217,7 +217,7 @@
 
         <tr>
             <td><strong>Spouse Name:</strong></td>
-            <td>{{ $invoice->loan->member->spouse_name ?? '-' }}</td>
+            <td>{{ $loan->spousename ?? '-' }}</td>
 
             <td><strong>Loan Amount:</strong></td>
             <td>₹ {{ number_format($invoice->loan->principal,2) }}</td>
@@ -246,7 +246,7 @@
             <td> {{ number_format($invoice->loan->insurance ?? 10,2) }}</td>
 
             <td><strong>Phone:</strong></td>
-            <td>{{ $invoice->loan->member->phone ?? '-' }}</td>
+            <td>{{ $loan->member->mobile ?? '-' }}</td>
         </tr>
 
         <tr>

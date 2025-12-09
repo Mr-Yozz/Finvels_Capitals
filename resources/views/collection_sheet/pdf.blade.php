@@ -33,7 +33,7 @@
         table.collection th,
         table.collection td {
             border: 1px solid #000;
-            padding: 6px;
+            padding: 4px;
             text-align: center;
             font-size: 11px;
             word-wrap: break-word;
@@ -54,8 +54,7 @@
         }
 
         .summary-box td {
-            padding: 6px;
-            border: 0;
+            page-break-before: auto;
         }
     </style>
 </head>
@@ -144,7 +143,7 @@
                 <td>{{ $r['member_id'] ?? '-' }}</td>
                 <td style="text-align:left;">{{ $r['member_name'] ?? '-' }}</td>
 
-                <td style="text-align:left;">
+                <td style="text-align:left; font-size:7px;">
                     @if(!empty($r['loan_instances']) && is_array($r['loan_instances']))
                     @foreach($r['loan_instances'] as $li)
                     {!! nl2br(e($li)) !!}<br>

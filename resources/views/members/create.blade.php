@@ -24,12 +24,18 @@
             <div class="mb-3">
                 <label class="form-label">Member Name</label>
                 <input type="text" name="name" class="form-control" required>
+                @error('name')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label>Mobile</label>
                 <input type="text" name="mobile" class="form-control"
                     value="{{ session('member_form_data.mobile') }}" required>
+                @error('mobile')
+                <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-3">
@@ -84,6 +90,11 @@
                 <option value="member" {{ old('role') == 'member' ? 'selected' : '' }}>Member</option>
             </select>
 
+            @error('generated_email_check')
+            <div class="alert alert-danger">
+                {{ $message }}
+            </div>
+            @enderror
 
             <button class="btn btn-success w-100">Create Member</button>
         </form>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Cashbook;
 use App\Models\Repayment;
 use App\Models\Loan;
+use App\Models\Expense;
 use App\Exports\CashbookExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -51,8 +52,6 @@ class CashbookController extends Controller
         ));
     }
 
-
-
     // ------------------------------
     // STORE / UPDATE DAILY CASHBOOK
     // ------------------------------
@@ -64,32 +63,57 @@ class CashbookController extends Controller
             'expenses' => 'nullable|numeric'
         ]);
 
-        $date = $request->date;
+        $date = Carbon::parse($request->date)->toDateString();
 
-        // Yesterday cashbook
-        $yesterday = Carbon::parse($date)->subDay()->toDateString();
-        $yCashbook = Cashbook::whereDate('date', $yesterday)->first();
+        /* ✅ LAST AVAILABLE CASHBOOK */
+        $lastCashbook = Cashbook::whereDate('date', '<', $date)
+            ->orderBy('date', 'desc')
+            ->first();
 
-        // AUTO Opening Balance
-        $openingBalance = $yCashbook->closing_balance ?? 0;
+        $openingBalance = $lastCashbook ? $lastCashbook->closing_balance : 0;
 
-        // AUTO Total Collection
-        $totalCollection = Repayment::whereDate('paid_at', $date)->sum('paid_amount');
+        /* ✅ IF DAYS WERE SKIPPED → ADD MISSED COLLECTIONS & EXPENSES */
+        if ($lastCashbook) {
+            $fromDate = Carbon::parse($lastCashbook->date)->addDay();
+            $toDate   = Carbon::parse($date)->subDay();
 
-        $deposit = $request->deposit ?? 0;
+            if ($fromDate->lte($toDate)) {
+
+                $missedCollections = Repayment::whereBetween('paid_at', [
+                    $fromDate->toDateString(),
+                    $toDate->toDateString()
+                ])
+                    ->where('status', 'paid')
+                    ->sum('paid_amount');
+
+                $missedExpenses = Expense::whereBetween('expense_date', [
+                    $fromDate->toDateString(),
+                    $toDate->toDateString()
+                ])->sum('amount');
+
+                $openingBalance = $openingBalance + $missedCollections - $missedExpenses;
+            }
+        }
+
+        /* ✅ TODAY COLLECTION */
+        $totalCollection = Repayment::whereDate('paid_at', $date)
+            ->where('status', 'paid')
+            ->sum('paid_amount');
+
+        $deposit  = $request->deposit ?? 0;
         $expenses = $request->expenses ?? 0;
 
-        // AUTO Closing Balance
+        /* ✅ FINAL CLOSING */
         $closingBalance = $openingBalance + $totalCollection - $deposit - $expenses;
 
         Cashbook::updateOrCreate(
             ['date' => $date],
             [
-                'opening_balance' => $openingBalance,
+                'opening_balance'  => $openingBalance,
                 'total_collection' => $totalCollection,
-                'deposit' => $deposit,
-                'expenses' => $expenses,
-                'closing_balance' => $closingBalance
+                'deposit'          => $deposit,
+                'expenses'         => $expenses,
+                'closing_balance'  => $closingBalance
             ]
         );
 

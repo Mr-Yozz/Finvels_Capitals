@@ -43,7 +43,8 @@
 
         <div class="mb-3">
             <label class="form-label">Role:</label>
-            <input type="text" name="role" class="form-control" value="{{ $user->role }}">
+            <input type="text" name="role" class="form-control" value="{{ $user->role }}"
+                @if($user->role === 'admin') readonly @endif>
         </div>
 
         <button class="btn btn-primary">Update Profile</button>

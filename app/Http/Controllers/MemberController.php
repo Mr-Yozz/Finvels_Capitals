@@ -57,21 +57,50 @@ class MemberController extends Controller
     }
 
 
+    // public function store(Request $request)
+    // {
+    //     $email = $request->name . $request->mobile . '@member.local';
+
+    //     // Create related User
+    //     $user = User::create([
+    //         'name' => $request->name,
+    //         'phone' => $request->mobile,
+    //         'email' => $email,
+    //         'password' => Hash::make('123456'),
+    //         'role' => 'user'
+    //     ]);
+
+    //     // Validate only allowed fields
+    //     $data = $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'mobile' => 'required|string|max:20',
+    //         'aadhaar_encrypted' => 'required|string',
+    //         'pan_encrypted' => 'required|string',
+    //         'bank_name' => 'nullable|string',
+    //         'account_number' => 'required|string',
+    //         'branch_name' => 'nullable|string',
+    //         'ifsc_code' => 'required|string|max:50',
+    //         'group_id' => 'required|exists:groups,id',
+    //         'role' => 'required|in:leader,sub_leader,member',
+    //     ]);
+
+    //     // Add missing column (user_id) if your Member table has user_id
+    //     $data['user_id'] = $user->id;
+
+    //     // Create member only with validated data
+    //     $member = Member::create($data);
+
+    //     return redirect()->route('members.create')
+    //         ->with('success', 'Member created successfully!');
+    // }
+
     public function store(Request $request)
     {
+        // 1. GENERATE THE EMAIL
         $email = $request->name . $request->mobile . '@member.local';
 
-        // Create related User
-        $user = User::create([
-            'name' => $request->name,
-            'phone' => $request->mobile,
-            'email' => $email,
-            'password' => Hash::make('123456'),
-            'role' => 'user'
-        ]);
-
-        // Validate only allowed fields
-        $data = $request->validate([
+        // 2. VALIDATE INPUTS AND DYNAMICALLY CHECK EMAIL UNIQUENESS
+        $rules = [
             'name' => 'required|string|max:255',
             'mobile' => 'required|string|max:20',
             'aadhaar_encrypted' => 'required|string',
@@ -82,10 +111,35 @@ class MemberController extends Controller
             'ifsc_code' => 'required|string|max:50',
             'group_id' => 'required|exists:groups,id',
             'role' => 'required|in:leader,sub_leader,member',
+        ];
+
+        // Add a temporary rule to check if the GENERATED email is unique in the 'users' table.
+        // We pass the email variable as part of the request for validation.
+        $request->merge(['generated_email_check' => $email]);
+        $rules['generated_email_check'] = 'unique:users,email';
+
+        // Validate the request data
+        $data = $request->validate($rules, [
+            // Custom message for the uniqueness check
+            'generated_email_check.unique' => 'A member with this Name and Mobile number already exists (email generated is not unique).'
         ]);
 
-        // Add missing column (user_id) if your Member table has user_id
+        // If validation fails, it automatically redirects back to the previous page
+        // (members.create) with the input and errors.
+
+        // 3. CREATE RELATED USER
+        $user = User::create([
+            'name' => $request->name,
+            'phone' => $request->mobile,
+            'email' => $email, // Use the generated email
+            'password' => Hash::make('123456'),
+            'role' => 'user'
+        ]);
+
+        // 4. CREATE MEMBER
         $data['user_id'] = $user->id;
+        // Remove the temporary email check field before creating the Member record
+        unset($data['generated_email_check']);
 
         // Create member only with validated data
         $member = Member::create($data);
@@ -142,7 +196,7 @@ class MemberController extends Controller
         try {
 
             // Create user first
-            $email = $data['mobile'] . '@member.local';
+            $email = $data['name'] . $data['mobile'] . '@member.local';
 
             $user = User::create([
                 'name'      => $data['name'],

@@ -163,7 +163,7 @@
     </table> --}} -->
     @if($loan->invoice)
     <a href="{{ route('invoice.pdf', $loan->invoice->id) }}" class="btn btn-danger">
-       Invoice Download PDF 
+        Invoice Download PDF
     </a>
 
     <a href="{{ route('invoice.excel', $loan->invoice->id) }}" class="btn btn-success">
@@ -228,8 +228,8 @@
                 <div class="value">₹ {{ number_format($loan->principal,2) }}</div>
             </div>
             <div class="field-row">
-                <div class="label">ROI / APR :</div>
-                <div class="value">{{ $loan->interest_rate }}% / {{ number_format($loan->interest_rate + 5,2) }}%</div>
+                <div class="label">Group :</div>
+                <div class="value">{{ $loan->member->group->name }}</div>
             </div>
             <div class="field-row">
                 <div class="label">Term Of Loan:</div>
